@@ -4,6 +4,7 @@ Caminhos de dados e planilha — local, servidor ou Streamlit Cloud.
 Variáveis de ambiente (ou secrets do Streamlit, injetadas em app.py):
   GRAMADOWAY_DATA_DIR  — pasta para usuários, histórico, registry
   GRAMADOWAY_PLANILHA  — caminho absoluto do .xlsx
+  GRAMADOWAY_PLANILHA_URL  — URL HTTPS direta a um .xlsx (útil na Streamlit Cloud)
 """
 from __future__ import annotations
 
@@ -36,6 +37,7 @@ def inject_streamlit_secrets_into_environ() -> None:
         for key in (
             "GRAMADOWAY_DATA_DIR",
             "GRAMADOWAY_PLANILHA",
+            "GRAMADOWAY_PLANILHA_URL",
             "GRAMADOWAY_PRIORIDADE_PRODUTOS",
             "GRAMADOWAY_API_URL",
             "GRAMADOWAY_API_KEY",

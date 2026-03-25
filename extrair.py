@@ -136,13 +136,22 @@ def _extrair_codigo(produto: str) -> tuple[str, str]:
     return "", produto
 
 
-def _linhas_dados(ws, padding: int = 600, cap: int = 12000) -> range:
+def _linhas_dados(ws, padding: int = 8000, cap: int = 30000) -> range:
     """
     Intervalo de linhas a percorrer em cada aba.
-    O max_row do openpyxl costuma subestimar folhas grandes; amplia com margem.
+    Amplia bem além de max_row (planilhas antigas / export às vezes reportam poucas linhas).
+    Percorre colunas típicas e estende o fim até a última célula preenchida + margem.
     """
     mr = max(ws.max_row or 0, 3)
-    end = min(mr + padding, cap)
+    scan_end = min(mr + padding, cap)
+    last = mr
+    for r in range(3, scan_end + 1):
+        for c in (1, 2, 3, 6, 7, 8):
+            v = ws.cell(r, c).value
+            if v is not None and str(v).strip():
+                last = r
+                break
+    end = min(last + 30, cap)
     return range(3, end + 1)
 
 

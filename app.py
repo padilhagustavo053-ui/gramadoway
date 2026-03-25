@@ -683,6 +683,20 @@ def _carregar_produtos_arquivo(path_resolvido: str) -> list:
     return extrair_todos(path_resolvido)
 
 
+@st.cache_data(ttl=300)
+def _carregar_produtos_url(url: str) -> list:
+    """Baixa .xlsx público (ex.: link direto na nuvem) — use GRAMADOWAY_PLANILHA_URL nos secrets."""
+    import httpx
+
+    with httpx.Client(timeout=120.0, follow_redirects=True) as client:
+        r = client.get(url)
+        r.raise_for_status()
+        data = r.content
+    if not data or len(data) < 100:
+        raise ValueError("Resposta vazia ou demasiado pequena para ser um .xlsx")
+    return extrair_todos_de_bytes(data)
+
+
 def carregar_produtos_ui() -> tuple[list, str]:
     """
     Fonte de produtos (ordem padrão — lista completa no PC local):
@@ -712,6 +726,15 @@ def carregar_produtos_ui() -> tuple[list, str]:
             return extrair_todos_de_bytes(blob), "upload_sessao.xlsx"
         except Exception as e:
             st.error(f"Erro ao ler o Excel enviado: {e}")
+
+    url_plan = os.environ.get("GRAMADOWAY_PLANILHA_URL", "").strip()
+    if url_plan:
+        try:
+            prod_url = _carregar_produtos_url(url_plan)
+            if prod_url:
+                return prod_url, url_plan
+        except Exception as e:
+            st.warning(f"URL da planilha (secrets) falhou — a tentar disco/API/catálogo. Detalhe: {e}")
 
     if prioridade_api:
         prod, src = _de_api()
@@ -923,9 +946,12 @@ def main():
 
     src_prod = str(path_planilha or "")
     if src_prod == "catalogo_embutido":
-        st.success(
-            "**Catálogo Gramadoway** carregado — já pode orçar. "
-            "Preços de **referência**; para a sua planilha oficial, abra **Substituir planilha** abaixo."
+        st.warning(
+            "**Lista de demonstração (~57 produtos)** — não é a sua planilha completa. "
+            "Na **Streamlit Cloud** o servidor **não vê** a Área de Trabalho do seu PC. "
+            "Para ter todos os itens: **(1)** envie o .xlsx em *Substituir planilha* abaixo, "
+            "**(2)** ou coloque `data/planilha.xlsx` no repositório e faça push, "
+            "**(3)** ou defina no *secrets* a variável **`GRAMADOWAY_PLANILHA_URL`** com link **direto** ao ficheiro .xlsx."
         )
     elif src_prod.startswith("http"):
         st.caption(f"Produtos da **API**: `{src_prod}`")
@@ -942,10 +968,14 @@ def main():
             unsafe_allow_html=True,
         )
 
-    with st.expander("Substituir planilha de preços (.xlsx) — opcional", expanded=False):
+    with st.expander(
+        "Substituir planilha de preços (.xlsx) — opcional",
+        expanded=(src_prod == "catalogo_embutido"),
+    ):
         st.caption(
-            "Se tiver o Excel oficial Gramadoway, envie aqui. "
-            "Senão, o catálogo embutido continua ativo. Ficheiro em `data/planilha.xlsx` no projeto também é usado automaticamente."
+            "Excel com as abas: Personalizados, Barras, Bombons liquidos, Bombons 12gr, "
+            "Trufas e trufados, Degustação, Planilha9. Em `data/planilha.xlsx` no Git "
+            "também é carregado automaticamente (útil na nuvem)."
         )
         c_up, c_lim = st.columns([2, 1])
         with c_up:
