@@ -1,8 +1,10 @@
 """
 Utilitários: máscaras, formatação, CEP, totais do pedido.
 """
+from __future__ import annotations
+
 import re
-from typing import Optional
+from typing import Optional, Set, Tuple
 
 import pandas as pd
 
@@ -82,7 +84,7 @@ def aplicar_totais_pedido(df: pd.DataFrame) -> None:
     df["Total"] = (q * p).round(2)
 
 
-def chaves_produtos_df(df: pd.DataFrame) -> set[tuple[str, str, str]]:
+def chaves_produtos_df(df: pd.DataFrame) -> Set[Tuple[str, str, str]]:
     """Identifica linhas do catálogo (categoria, produto, código)."""
     if df is None or len(df) == 0:
         return set()
