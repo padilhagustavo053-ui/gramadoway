@@ -1,0 +1,14 @@
+# Dados sensíveis — não enviar ao Git
+data/*.xlsx
+data/*.XLSX
+data/usuarios/
+data/users/
+data/.migrated_from_pedidos
+
+# Secrets locais
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/

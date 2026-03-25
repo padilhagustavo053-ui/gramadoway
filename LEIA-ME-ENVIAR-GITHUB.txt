@@ -1,0 +1,22 @@
+================================================================================
+  GRAMADOWAY — pasta pronta na Área de trabalho
+================================================================================
+
+O QUE É ISTO
+  Cópia do sistema para você enviar ao GitHub sem procurar pastas do Cursor.
+
+O QUE FAZER NO GITHUB DESKTOP
+  1. Abra o GitHub Desktop
+  2. Add an Existing Repository from your local drive
+  3. Escolha ESTA pasta:
+       C:\Users\Usuario\Desktop\Gramadoway
+  4. Commit (ex.: "primeiro envio") → Publish / Push
+
+PLANILHA DE PREÇOS
+  • Coloque o arquivo Excel aqui:  data\planilha.xlsx
+    (ou envie depois pela tela do site, na nuvem)
+
+DÚVIDA
+  Depois do envio, siga a Parte 4 (Streamlit Cloud) que o assistente explicou.
+
+================================================================================

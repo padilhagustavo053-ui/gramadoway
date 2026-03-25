@@ -1,0 +1,104 @@
+[
+  {
+    "id": "20260324_170454",
+    "data": "24/03/2026 17:04",
+    "cliente": {
+      "Razão Social": "",
+      "Fantasia": "",
+      "CNPJ": "",
+      "Fone": "",
+      "Endereço": "",
+      "Cidade": "",
+      "Bairro": "",
+      "CEP": "",
+      "E-mail": "",
+      "Contato": "",
+      "I. Estadual": "",
+      "Cond. Pagto": "",
+      "Frete": "",
+      "Observação": ""
+    },
+    "itens": [
+      {
+        "Qtde": 5.0,
+        "Un.": "UN",
+        "Produto": "Boneco Gengibre 45g",
+        "Preço": 7.5,
+        "Total": 37.5
+      },
+      {
+        "Qtde": 5.0,
+        "Un.": "KG",
+        "Produto": "Licor de Cereja (kg)",
+        "Preço": 149.0,
+        "Total": 745.0
+      },
+      {
+        "Qtde": 25.0,
+        "Un.": "UN",
+        "Produto": "Licor de Marula (un)",
+        "Preço": 3.0,
+        "Total": 75.0
+      }
+    ],
+    "total": 857.5
+  },
+  {
+    "id": "20260324_080240",
+    "data": "24/03/2026 08:02",
+    "cliente": {
+      "Razão Social": "",
+      "Fantasia": "",
+      "CNPJ": "",
+      "Fone": "",
+      "Endereço": "",
+      "Cidade": "",
+      "Bairro": "",
+      "CEP": "",
+      "E-mail": "",
+      "Contato": "",
+      "I. Estadual": "",
+      "Cond. Pagto": "",
+      "Frete": "",
+      "Observação": ""
+    },
+    "itens": [
+      {
+        "Qtde": 10.0,
+        "Un.": "UN",
+        "Produto": "Avião 35g Branco",
+        "Preço": 6.5,
+        "Total": 65.0
+      },
+      {
+        "Qtde": 20.0,
+        "Un.": "UN",
+        "Produto": "Boneca 30g",
+        "Preço": 5.8,
+        "Total": 116.0
+      },
+      {
+        "Qtde": 10.0,
+        "Un.": "UN",
+        "Produto": "Boneco Gengibre 45g",
+        "Preço": 7.5,
+        "Total": 75.0
+      },
+      {
+        "Qtde": 20.0,
+        "Un.": "UN",
+        "Produto": "Puro 12g (un)",
+        "Preço": 2.5,
+        "Total": 50.0
+      },
+      {
+        "Qtde": 4.0,
+        "Un.": "KG",
+        "Produto": "Cast. Cajú 14g (kg)",
+        "Preço": 138.0,
+        "Total": 552.0
+      }
+    ],
+    "total": 858.0
+  }
+]
