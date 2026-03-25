@@ -7,4 +7,15 @@ enableXsrfProtection = true
 gatherUsageStats = false
 
 [theme]
+# Cores válidas (hex) — evita avisos no browser com primaryColor/textColor vazios no Cloud
 base = "light"
+primaryColor = "#C9A227"
+backgroundColor = "#FAF7F2"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#1a1410"
+
+[theme.sidebar]
+primaryColor = "#C9A227"
+backgroundColor = "#F5F0E8"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#1a1410"

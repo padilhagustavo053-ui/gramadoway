@@ -3,18 +3,11 @@
 Sistema de Pedidos Gramadoway — Potente, robusto e grandioso
 Design inspirado em formulários profissionais de chocolates artesanais.
 """
-import json
-
 import streamlit as st
 import streamlit.components.v1 as components
 from pathlib import Path
 import pandas as pd
 from datetime import datetime
-
-try:
-    from streamlit_lottie import st_lottie
-except ImportError:  # pragma: no cover
-    st_lottie = None  # type: ignore
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
@@ -37,8 +30,6 @@ from historico import (
 from utils import mascara_cnpj, mascara_telefone, mascara_cep, formatar_moeda, aplicar_totais_pedido
 from busca_inteligente import buscar_produtos, parsear_atalho
 import auth
-
-_APP_DIR = Path(__file__).resolve().parent
 
 # Som suave (Web Audio) — iframe 0px após clicar "Entrar no sistema"
 GW_CHIME_HTML = """
@@ -65,16 +56,6 @@ GW_CHIME_HTML = """
 </script>
 </body></html>
 """
-
-
-def _welcome_lottie_dict():
-    p = _APP_DIR / "assets" / "welcome_sparkle.json"
-    if not p.is_file():
-        return None
-    try:
-        return json.loads(p.read_text(encoding="utf-8"))
-    except Exception:
-        return None
 
 
 st.set_page_config(
@@ -111,19 +92,24 @@ st.markdown("""
     --sombra-press: inset 0 2px 6px rgba(0,0,0,0.12);
 }
 
-/* ========== Launch / boas-vindas ========== */
+/* ========== Launch / boas-vindas (simples, centrado, sem Lottie) ========== */
 #gw-launch-anchor { position: absolute; width: 0; height: 0; pointer-events: none; }
 body:has(#gw-launch-anchor) [data-testid="stHeader"] { display: none !important; }
 body:has(#gw-launch-anchor) [data-testid="stSidebar"] { display: none !important; }
-body:has(#gw-launch-anchor) .stMainBlockContainer { padding-top: 0.5rem !important; max-width: 100% !important; }
 
-/* Splash: fundo em toda a vista — moderno, contraste forte (não “chocolate chapado”) */
+/* Conteúdo centralizado — evita texto “cortado” à esquerda no Cloud */
+body:has(#gw-launch-anchor) .stMainBlockContainer {
+    max-width: 28rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 1.5rem 1.25rem 2.5rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Fundo: slate frio, sóbrio (sem roxo/dourado pesado) */
 body:has(#gw-launch-anchor) .stApp {
-    background:
-        radial-gradient(ellipse 90% 55% at 50% -8%, rgba(201,162,39,0.22) 0%, transparent 52%),
-        radial-gradient(ellipse 55% 40% at 95% 85%, rgba(99,102,241,0.14) 0%, transparent 50%),
-        radial-gradient(ellipse 45% 35% at 5% 60%, rgba(16,185,129,0.08) 0%, transparent 45%),
-        linear-gradient(168deg, #070605 0%, #12100e 42%, #0a0908 100%) !important;
+    background: linear-gradient(165deg, #0b1220 0%, #111827 38%, #0f172a 100%) !important;
 }
 body:has(#gw-launch-anchor) [data-testid="stAppViewContainer"],
 body:has(#gw-launch-anchor) [data-testid="stMain"],
@@ -132,138 +118,87 @@ body:has(#gw-launch-anchor) .main {
 }
 
 .gw-launch-shell {
-    min-height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     text-align: center;
-    padding: 2rem 1.75rem 1.5rem;
-    margin: 0.5rem auto 0.75rem;
-    max-width: 560px;
-    border-radius: 24px;
-    background: rgba(255,255,255,0.06);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.14);
-    box-shadow:
-        0 32px 64px rgba(0,0,0,0.45),
-        inset 0 1px 0 rgba(255,255,255,0.1);
+    padding: 1.75rem 1.5rem 1.5rem;
+    margin: 0 auto 1.25rem;
+    max-width: 100%;
+    border-radius: 20px;
+    background: rgba(15,23,42,0.65);
+    border: 1px solid rgba(148,163,184,0.22);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.35);
     position: relative;
-    overflow: hidden;
 }
-.gw-launch-shell::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(ellipse at 20% 0%, rgba(201,162,39,0.12) 0%, transparent 42%),
-        radial-gradient(ellipse at 80% 100%, rgba(255,255,255,0.05) 0%, transparent 40%);
-    pointer-events: none;
+.gw-launch-inner { position: relative; z-index: 1; }
+.gw-launch-mark {
+    margin: 0 auto 1.25rem;
+    display: flex;
+    justify-content: center;
 }
-@keyframes gw-glow-pulse {
-    0%, 100% { opacity: 0.85; }
-    50% { opacity: 1; }
-}
-.gw-launch-inner { position: relative; z-index: 1; max-width: 520px; }
 .gw-launch-kicker {
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.28em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #fef3c7 !important;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    margin-bottom: 1rem;
-    animation: gw-fade-up 0.9s ease-out both;
+    color: #94a3b8 !important;
+    margin-bottom: 0.75rem;
 }
 .gw-launch-title {
     font-family: 'Fraunces', Georgia, serif !important;
-    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-size: clamp(1.75rem, 6vw, 2.35rem);
     font-weight: 700;
-    line-height: 1.15;
-    color: #ffffff !important;
-    margin: 0 0 0.5rem 0;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.55);
-    animation: gw-fade-up 0.9s ease-out 0.12s both;
+    line-height: 1.2;
+    color: #f8fafc !important;
+    margin: 0 0 0.65rem 0;
 }
 .gw-launch-sub {
     font-family: 'Inter', sans-serif !important;
-    font-size: 1.0625rem;
-    font-weight: 600;
-    color: #f1f5f9 !important;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.45);
-    margin: 0 0 1.25rem 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #cbd5e1 !important;
+    margin: 0;
     line-height: 1.55;
-    animation: gw-fade-up 0.9s ease-out 0.22s both;
-}
-.gw-launch-loader {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.45rem;
-    margin-bottom: 2rem;
-    animation: gw-fade-up 0.9s ease-out 0.35s both;
-}
-.gw-launch-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, var(--ouro-claro), var(--ouro));
-    box-shadow: 0 0 12px rgba(201,162,39,0.6);
-    animation: gw-dot-bounce 1.2s ease-in-out infinite;
-}
-.gw-launch-dot:nth-child(2) { animation-delay: 0.15s; }
-.gw-launch-dot:nth-child(3) { animation-delay: 0.3s; }
-@keyframes gw-dot-bounce {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
-    40% { transform: translateY(-10px); opacity: 1; }
-}
-.gw-launch-bar {
-    height: 3px;
-    width: min(280px, 85vw);
-    margin: 0 auto 1.75rem;
-    border-radius: 3px;
-    background: rgba(255,255,255,0.12);
-    overflow: hidden;
-    animation: gw-fade-up 0.9s ease-out 0.4s both;
-}
-.gw-launch-bar > span {
-    display: block;
-    height: 100%;
-    width: 40%;
-    border-radius: 3px;
-    background: linear-gradient(90deg, transparent, var(--ouro), var(--ouro-claro), transparent);
-    animation: gw-bar-shine 1.8s ease-in-out infinite;
-}
-@keyframes gw-bar-shine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(350%); }
-}
-@keyframes gw-fade-up {
-    from { opacity: 0; transform: translateY(18px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 .gw-launch-hint {
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.8125rem;
+    font-size: 0.78rem;
     font-weight: 500;
-    color: rgba(241,245,249,0.78) !important;
-    margin-top: 1.25rem;
-    animation: gw-fade-up 0.9s ease-out 0.5s both;
-}
-.gw-lottie-slot {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    margin: -0.5rem auto 0.25rem !important;
-    min-height: 188px;
-}
-.gw-launch-footer {
+    color: #64748b !important;
+    margin: 1.25rem 0 0 0;
     text-align: center;
-    padding: 0 1rem 0.5rem;
-    margin: 0 auto;
-    max-width: 520px;
+}
+@keyframes gw-fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Botões do splash: sempre visíveis, largura total, sem herança estranha */
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton {
+    width: 100% !important;
+}
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button {
+    width: 100% !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    min-height: 3.1rem !important;
+    font-size: 1rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: rgba(30,41,59,0.95) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148,163,184,0.5) !important;
+}
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #d4a20c, #b8860b) !important;
+    color: #0f172a !important;
+    border: none !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
+}
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+    border: 2px solid rgba(226,232,240,0.55) !important;
+    box-shadow: none !important;
 }
 
 /* Cartão login — após launch */
@@ -300,32 +235,15 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown span,
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown div {
     color: #f8fafc !important;
 }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-kicker { color: #fef3c7 !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-title { color: #ffffff !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-sub { color: #f1f5f9 !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-hint { color: rgba(241,245,249,0.8) !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-kicker { color: #94a3b8 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-title { color: #f8fafc !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-sub { color: #cbd5e1 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-hint { color: #64748b !important; }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown strong { color: #ffffff !important; }
 
 /* Página de login (após splash): leve contraste no fundo */
 body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stApp {
     background: linear-gradient(180deg, #faf7f2 0%, #f5f0e8 100%) !important;
-}
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button {
-    border-radius: 14px !important;
-    font-weight: 700 !important;
-    min-height: 3rem !important;
-}
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #f0d078, #c9a227) !important;
-    color: #1a1208 !important;
-    border: none !important;
-    box-shadow: 0 6px 28px rgba(201,162,39,0.4) !important;
-}
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] {
-    background: rgba(255,255,255,0.08) !important;
-    color: #ffffff !important;
-    border: 2px solid rgba(255,255,255,0.45) !important;
-    box-shadow: none !important;
 }
 
 /* Logo: título branco — override qualquer herança */
@@ -777,83 +695,49 @@ def carregar_produtos_ui() -> tuple[list, str]:
 
 
 def _render_launch_splash() -> None:
-    """Primeira visita na sessão: Lottie + boas-vindas antes do login."""
+    """Primeira visita: boas-vindas minimalistas + ações claras (sem Lottie / sem iframe branco)."""
     st.markdown('<div id="gw-launch-anchor" aria-hidden="true"></div>', unsafe_allow_html=True)
     st.markdown(
         """
         <div class="gw-launch-shell">
           <div class="gw-launch-inner">
+            <div class="gw-launch-mark" aria-hidden="true">
+              <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="14" width="36" height="28" rx="6" stroke="#C9A227" stroke-width="2" fill="none"/>
+                <path d="M18 26 L28 33 L38 26" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
             <p class="gw-launch-kicker">Chocolates artesanais</p>
-            <h1 class="gw-launch-title">Seja bem-vindo</h1>
-            <p class="gw-launch-sub">Pedidos e orçamentos num só lugar.<br/><strong style="color:#fff;">Entre</strong> com a sua conta ou <strong style="color:#fff;">crie uma nova</strong> — escolha abaixo.</p>
+            <h1 class="gw-launch-title">Gramadoway</h1>
+            <p class="gw-launch-sub">Pedidos e orçamentos. <strong>Entre</strong> ou <strong>crie a sua conta</strong>.</p>
           </div>
         </div>
+        <p class="gw-launch-hint">Toque num dos botões abaixo para continuar</p>
         """,
         unsafe_allow_html=True,
     )
-    lottie = _welcome_lottie_dict()
-    _, c1, _ = st.columns([1, 2.2, 1])
-    with c1:
-        st.markdown('<div class="gw-lottie-slot">', unsafe_allow_html=True)
-        if lottie and st_lottie is not None:
-            try:
-                st_lottie(
-                    lottie,
-                    speed=1,
-                    reverse=False,
-                    loop=True,
-                    quality="high",
-                    height=180,
-                    width=180,
-                    key="gw_welcome_lottie",
-                )
-            except Exception:
-                st.markdown(
-                    '<div class="gw-launch-loader" style="justify-content:center;padding:1rem 0;">'
-                    '<span class="gw-launch-dot"></span><span class="gw-launch-dot"></span><span class="gw-launch-dot"></span>'
-                    "</div>",
-                    unsafe_allow_html=True,
-                )
-        else:
-            st.markdown(
-                '<div class="gw-launch-loader" style="justify-content:center;padding:1rem 0;">'
-                '<span class="gw-launch-dot"></span><span class="gw-launch-dot"></span><span class="gw-launch-dot"></span>'
-                "</div>",
-                unsafe_allow_html=True,
-            )
-        st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class="gw-launch-footer">
-            <div class="gw-launch-bar" aria-hidden="true"><span></span></div>
-            <p class="gw-launch-hint">Gramadoway • Acesso seguro à sua área de pedidos</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    _, c_entrar, c_criar, _ = st.columns([0.2, 1, 1, 0.2], gap="medium")
-    with c_entrar:
-        if st.button(
-            "Entrar",
-            type="primary",
-            use_container_width=True,
-            key="gw_splash_entrar",
-        ):
-            st.session_state["gw_splash_done"] = True
-            st.session_state["gw_auth_choice"] = "Entrar"
-            st.session_state["_gw_play_chime"] = True
-            st.rerun()
-    with c_criar:
-        if st.button(
-            "Criar minha conta",
-            type="secondary",
-            use_container_width=True,
-            key="gw_splash_criar",
-        ):
-            st.session_state["gw_splash_done"] = True
-            st.session_state["gw_auth_choice"] = "Criar minha conta"
-            st.session_state["_gw_play_chime"] = True
-            st.rerun()
+    st.markdown('<div style="height:1rem" aria-hidden="true"></div>', unsafe_allow_html=True)
+    if st.button(
+        "Entrar",
+        type="primary",
+        use_container_width=True,
+        key="gw_splash_entrar",
+    ):
+        st.session_state["gw_splash_done"] = True
+        st.session_state["gw_auth_choice"] = "Entrar"
+        st.session_state["_gw_play_chime"] = True
+        st.rerun()
+    st.markdown('<div style="height:0.6rem" aria-hidden="true"></div>', unsafe_allow_html=True)
+    if st.button(
+        "Criar minha conta",
+        type="secondary",
+        use_container_width=True,
+        key="gw_splash_criar",
+    ):
+        st.session_state["gw_splash_done"] = True
+        st.session_state["gw_auth_choice"] = "Criar minha conta"
+        st.session_state["_gw_play_chime"] = True
+        st.rerun()
 
 
 def _render_login():
