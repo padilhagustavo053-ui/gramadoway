@@ -32,6 +32,7 @@ from utils import (
     mascara_cnpj,
     mascara_telefone,
     mascara_cep,
+    buscar_cep,
     formatar_moeda,
     aplicar_totais_pedido,
     chaves_produtos_df,
@@ -101,9 +102,9 @@ st.markdown("""
     --sombra-press: inset 0 2px 6px rgba(0,0,0,0.12);
 }
 
-/* ========== Launch / boas-vindas (simples, centrado, sem Lottie) ========== */
-#gw-launch-anchor { position: absolute; width: 0; height: 0; pointer-events: none; }
-body:has(#gw-launch-anchor) [data-testid="stHeader"] { display: none !important; }
+/* ========== Launch / login — identidade chocolate + ouro (banner GRAMADOWAY) ========== */
+#gw-launch-anchor, #gw-login-anchor { position: absolute; width: 0; height: 0; pointer-events: none; }
+body:has(#gw-launch-anchor) [data-testid="stHeader"],
 body:has(#gw-launch-anchor) [data-testid="stSidebar"] { display: none !important; }
 
 /* Conteúdo centralizado — evita texto “cortado” à esquerda no Cloud */
@@ -116,9 +117,9 @@ body:has(#gw-launch-anchor) .stMainBlockContainer {
     box-sizing: border-box !important;
 }
 
-/* Fundo: slate frio, sóbrio (sem roxo/dourado pesado) */
+/* Fundo chocolate escuro */
 body:has(#gw-launch-anchor) .stApp {
-    background: linear-gradient(165deg, #0b1220 0%, #111827 38%, #0f172a 100%) !important;
+    background: linear-gradient(180deg, #1a120b 0%, #2d1f14 42%, #1a120b 100%) !important;
 }
 body:has(#gw-launch-anchor) [data-testid="stAppViewContainer"],
 body:has(#gw-launch-anchor) [data-testid="stMain"],
@@ -128,43 +129,47 @@ body:has(#gw-launch-anchor) .main {
 
 .gw-launch-shell {
     text-align: center;
-    padding: 1.75rem 1.5rem 1.5rem;
+    padding: 2rem 1.5rem 1.75rem;
     margin: 0 auto 1.25rem;
     max-width: 100%;
-    border-radius: 20px;
-    background: rgba(15,23,42,0.65);
-    border: 1px solid rgba(148,163,184,0.22);
-    box-shadow: 0 24px 48px rgba(0,0,0,0.35);
+    border-radius: 0 0 18px 18px;
+    background: linear-gradient(180deg, rgba(45,34,24,0.97) 0%, rgba(26,18,11,0.99) 100%);
+    border: 1px solid rgba(201,162,39,0.28);
+    border-top: none;
+    border-bottom: 3px solid #C9A227;
+    box-shadow: 0 24px 56px rgba(0,0,0,0.55);
     position: relative;
 }
 .gw-launch-inner { position: relative; z-index: 1; }
 .gw-launch-mark {
-    margin: 0 auto 1.25rem;
+    margin: 0 auto 1.1rem;
     display: flex;
     justify-content: center;
 }
 .gw-launch-kicker {
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: #94a3b8 !important;
-    margin-bottom: 0.75rem;
+    color: #E5D4A1 !important;
+    margin-bottom: 0.65rem;
 }
 .gw-launch-title {
-    font-family: 'Fraunces', Georgia, serif !important;
-    font-size: clamp(1.75rem, 6vw, 2.35rem);
-    font-weight: 700;
-    line-height: 1.2;
-    color: #f8fafc !important;
-    margin: 0 0 0.65rem 0;
+    font-family: 'Inter', sans-serif !important;
+    font-size: clamp(1.85rem, 6vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff !important;
+    margin: 0 0 0.5rem 0;
 }
 .gw-launch-sub {
     font-family: 'Inter', sans-serif !important;
-    font-size: 1rem;
+    font-size: 0.98rem;
     font-weight: 500;
-    color: #cbd5e1 !important;
+    color: rgba(255,255,255,0.88) !important;
     margin: 0;
     line-height: 1.55;
 }
@@ -172,7 +177,7 @@ body:has(#gw-launch-anchor) .main {
     font-family: 'Inter', sans-serif !important;
     font-size: 0.78rem;
     font-weight: 500;
-    color: #64748b !important;
+    color: rgba(229,212,161,0.75) !important;
     margin: 1.25rem 0 0 0;
     text-align: center;
 }
@@ -193,29 +198,28 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button {
     font-size: 1rem !important;
     opacity: 1 !important;
     visibility: visible !important;
-    background: rgba(30,41,59,0.95) !important;
-    color: #f8fafc !important;
-    border: 1px solid rgba(148,163,184,0.5) !important;
+    background: rgba(26,18,11,0.85) !important;
+    color: #fff !important;
+    border: 1px solid rgba(201,162,39,0.45) !important;
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"],
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] * {
-    color: #0f172a !important;
-    -webkit-text-fill-color: #0f172a !important;
+    color: #1a120b !important;
+    -webkit-text-fill-color: #1a120b !important;
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #d4a20c, #b8860b) !important;
+    background: linear-gradient(135deg, #E5D4A1, #C9A227) !important;
     border: none !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
+    box-shadow: 0 8px 28px rgba(201,162,39,0.35) !important;
 }
-/* Secundário: Streamlit pinta o rótulo interno com theme textColor — forçar branco no botão e em tudo lá dentro */
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"],
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] * {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] {
-    background: rgba(15,23,42,0.5) !important;
-    border: 2px solid rgba(248,250,252,0.65) !important;
+    background: transparent !important;
+    border: 2px solid rgba(229,212,161,0.85) !important;
     box-shadow: none !important;
 }
 
@@ -259,9 +263,80 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-sub { color
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-hint { color: #64748b !important; }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown strong { color: #ffffff !important; }
 
-/* Página de login (após splash): leve contraste no fundo */
+/* Página de login (após splash): mesmo chocolate + cartão escuro */
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stHeader"],
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stSidebar"] { display: none !important; }
 body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stApp {
-    background: linear-gradient(180deg, #faf7f2 0%, #f5f0e8 100%) !important;
+    background: linear-gradient(180deg, #1a120b 0%, #2d1f14 45%, #1a120b 100%) !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stMainBlockContainer {
+    max-width: 26rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 1.25rem 1rem 2rem !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .gw-login-hero-strip {
+    text-align: center;
+    padding: 1.75rem 1.25rem 1.5rem;
+    margin: 0 -0.5rem 1.25rem -0.5rem;
+    border-radius: 0 0 16px 16px;
+    background: linear-gradient(180deg, #2d2218 0%, #1a1410 100%);
+    border-bottom: 3px solid #C9A227;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .gw-login-hero-strip h1 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.65rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.12em !important;
+    color: #fff !important;
+    margin: 0 !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .gw-login-hero-strip .sub {
+    font-size: 0.72rem !important;
+    letter-spacing: 0.22em !important;
+    text-transform: uppercase !important;
+    color: #E5D4A1 !important;
+    margin: 0.5rem 0 0 0 !important;
+    font-weight: 600 !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .gw-login-hero-strip .tag {
+    font-size: 0.78rem !important;
+    color: rgba(255,255,255,0.88) !important;
+    margin: 0.65rem 0 0 0 !important;
+    line-height: 1.45 !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) section[data-testid="stMain"] h3,
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) section[data-testid="stMain"] .stMarkdown h3 {
+    color: #fff !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) label,
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stWidgetLabel"] p {
+    color: #F5F0E8 !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stAlert"] {
+    background: rgba(45,34,24,0.9) !important;
+    border-color: rgba(201,162,39,0.4) !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stAlert"] p {
+    color: #fff !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stTextInput input {
+    background: rgba(255,255,255,0.96) !important;
+    color: #1a120b !important;
+    border-radius: 10px !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-baseweb="radio"] label,
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-baseweb="radio"] p {
+    color: #F5F0E8 !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) section[data-testid="stMain"] .stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #E5D4A1, #C9A227) !important;
+    color: #1a120b !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) section[data-testid="stMain"] .stButton > button[kind="primary"] * {
+    color: #1a120b !important;
+    -webkit-text-fill-color: #1a120b !important;
 }
 
 /* Logo: título branco — override qualquer herança */
@@ -771,12 +846,12 @@ def _render_launch_splash() -> None:
             <div class="gw-launch-mark" aria-hidden="true">
               <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="10" y="14" width="36" height="28" rx="6" stroke="#C9A227" stroke-width="2" fill="none"/>
-                <path d="M18 26 L28 33 L38 26" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <path d="M18 26 L28 33 L38 26" stroke="#E5D4A1" stroke-width="2" stroke-linecap="round" fill="none"/>
               </svg>
             </div>
             <p class="gw-launch-kicker">Chocolates artesanais</p>
             <h1 class="gw-launch-title">Gramadoway</h1>
-            <p class="gw-launch-sub">Pedidos e orçamentos. <strong>Entre</strong> ou <strong>crie a sua conta</strong>.</p>
+            <p class="gw-launch-sub">Sistema de orçamento • <strong>Entrar</strong> ou <strong>criar conta</strong></p>
           </div>
         </div>
         <p class="gw-launch-hint">Toque num dos botões abaixo para continuar</p>
@@ -813,7 +888,17 @@ def _render_login():
     if "gw_auth_choice" not in st.session_state:
         st.session_state["gw_auth_choice"] = "Entrar"
 
-    st.markdown("### Gramadoway — Acesso")
+    st.markdown(
+        """
+        <div class="gw-login-hero-strip">
+            <h1>GRAMADOWAY</h1>
+            <p class="sub">Chocolates artesanais</p>
+            <p class="tag">Sistema de orçamento • Digite as quantidades • Total calculado automaticamente</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown("### Acesso ao sistema")
     st.info(
         "Quem recebe o **link** pode usar o sistema por aqui. "
         "Em **Criar minha conta** você escolhe login e senha **só seus**. "
@@ -1037,7 +1122,30 @@ def main():
         fantasia = st.text_input("Fantasia", placeholder="Nome fantasia", key="fantasia")
         fone = st.text_input("Fone", placeholder="(00) 00000-0000", key="fone")
         bairro = st.text_input("Bairro", placeholder="Bairro", key="bairro")
-        cep = st.text_input("CEP", placeholder="00000-000", key="cep")
+        c_cep, c_btn = st.columns([1, 1])
+        with c_cep:
+            cep = st.text_input(
+                "CEP",
+                placeholder="00000-000",
+                key="cep",
+                help="Informe 8 dígitos e clique em Preencher — busca automática (ViaCEP).",
+            )
+        with c_btn:
+            st.markdown('<div style="height:1.72rem"></div>', unsafe_allow_html=True)
+            if st.button("Preencher pelo CEP", use_container_width=True, key="gw_buscar_cep"):
+                raw = str(st.session_state.get("cep") or "")
+                dados = buscar_cep(raw)
+                st.session_state.pop("_gw_cep_msg", None)
+                if dados:
+                    st.session_state["endereco"] = dados.get("Endereço") or st.session_state.get("endereco", "")
+                    st.session_state["bairro"] = dados.get("Bairro") or st.session_state.get("bairro", "")
+                    st.session_state["cidade"] = dados.get("Cidade") or st.session_state.get("cidade", "")
+                    st.session_state["cep"] = mascara_cep(raw)
+                else:
+                    st.session_state["_gw_cep_msg"] = "CEP não encontrado ou incompleto. Use 8 dígitos."
+                st.rerun()
+    if st.session_state.get("_gw_cep_msg"):
+        st.warning(st.session_state["_gw_cep_msg"])
     st.markdown("**Contato e condições**")
     col_c1, col_c2 = st.columns(2)
     with col_c1:
