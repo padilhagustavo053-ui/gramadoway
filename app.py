@@ -108,10 +108,10 @@ body:has(#gw-launch-anchor) [data-testid="stHeader"],
 body:has(#gw-launch-anchor) [data-testid="stSidebar"] { display: none !important; }
 
 body:has(#gw-launch-anchor) .stMainBlockContainer {
-    max-width: 28rem !important;
+    max-width: min(100vw - 1.25rem, 40rem) !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    padding: 1.5rem 1.25rem 2.5rem !important;
+    padding: 1.5rem 1rem 2.5rem !important;
     width: 100% !important;
     box-sizing: border-box !important;
 }
@@ -127,9 +127,11 @@ body:has(#gw-launch-anchor) .main {
 
 .gw-launch-shell {
     text-align: center;
-    padding: 2rem 1.5rem 1.75rem;
+    padding: 2rem 1.25rem 1.75rem;
     margin: 0 auto 1.5rem;
+    width: 100%;
     max-width: 100%;
+    box-sizing: border-box;
     border-radius: 16px;
     background: linear-gradient(180deg, #2f241c 0%, #1f1610 55%, #18100c 100%);
     border: 1px solid rgba(201,162,39,0.22);
@@ -154,13 +156,22 @@ body:has(#gw-launch-anchor) .main {
 }
 .gw-launch-title {
     font-family: 'Inter', sans-serif !important;
-    font-size: clamp(1.65rem, 5.5vw, 2.15rem);
+    font-size: clamp(1.05rem, 2.5vw + 0.55rem, 2.05rem);
     font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: 0.14em;
+    line-height: 1.12;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: #ffffff !important;
-    margin: 0 0 0.75rem 0;
+    margin: 0 auto 0.75rem auto;
+    display: inline-block;
+    white-space: nowrap;
+    max-width: 100%;
+}
+@media (max-width: 340px) {
+    .gw-launch-title {
+        font-size: 1.08rem !important;
+        letter-spacing: 0.04em !important;
+    }
 }
 .gw-launch-sub {
     font-family: 'Inter', sans-serif !important;
