@@ -117,7 +117,7 @@ body:has(#gw-launch-anchor) .stMainBlockContainer {
 }
 
 body:has(#gw-launch-anchor) .stApp {
-    background: linear-gradient(165deg, #0b1220 0%, #111827 38%, #0f172a 100%) !important;
+    background: linear-gradient(180deg, #080c14 0%, #0a0e1a 45%, #060a12 100%) !important;
 }
 body:has(#gw-launch-anchor) [data-testid="stAppViewContainer"],
 body:has(#gw-launch-anchor) [data-testid="stMain"],
@@ -127,60 +127,57 @@ body:has(#gw-launch-anchor) .main {
 
 .gw-launch-shell {
     text-align: center;
-    padding: 1.75rem 1.5rem 1.5rem;
-    margin: 0 auto 1.25rem;
+    padding: 2rem 1.5rem 1.75rem;
+    margin: 0 auto 1.5rem;
     max-width: 100%;
-    border-radius: 20px;
-    background: rgba(15,23,42,0.65);
-    border: 1px solid rgba(148,163,184,0.22);
-    box-shadow: 0 24px 48px rgba(0,0,0,0.35);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #2f241c 0%, #1f1610 55%, #18100c 100%);
+    border: 1px solid rgba(201,162,39,0.22);
+    border-bottom: 3px solid #C9A227;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.55), 0 0 40px rgba(201,162,39,0.06);
     position: relative;
 }
 .gw-launch-inner { position: relative; z-index: 1; }
 .gw-launch-mark {
-    margin: 0 auto 1.25rem;
+    margin: 0 auto 1.1rem;
     display: flex;
     justify-content: center;
 }
 .gw-launch-kicker {
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     font-weight: 600;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: #c9a88a !important;
-    margin-bottom: 0.75rem;
+    color: #c9a227 !important;
+    margin: 0 0 0.85rem 0;
 }
 .gw-launch-title {
-    font-family: 'Fraunces', Georgia, serif !important;
-    font-size: clamp(1.75rem, 6vw, 2.35rem);
-    font-weight: 700;
-    line-height: 1.2;
-    color: #faf6f1 !important;
-    margin: 0 0 0.65rem 0;
+    font-family: 'Inter', sans-serif !important;
+    font-size: clamp(1.65rem, 5.5vw, 2.15rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #ffffff !important;
+    margin: 0 0 0.75rem 0;
 }
 .gw-launch-sub {
     font-family: 'Inter', sans-serif !important;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
-    color: #e8ddd4 !important;
+    color: rgba(255,255,255,0.9) !important;
     margin: 0;
-    line-height: 1.55;
+    line-height: 1.5;
 }
+.gw-launch-sub strong { color: #fff !important; font-weight: 700 !important; }
 .gw-launch-hint {
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.78rem;
+    font-size: 0.84rem;
     font-weight: 500;
-    color: #a89888 !important;
-    margin: 1.25rem 0 0 0;
+    color: rgba(255,255,255,0.82) !important;
+    margin: 0 0 1rem 0;
     text-align: center;
-}
-/* Imagem opcional na entrada */
-body:has(#gw-launch-anchor) [data-testid="stImage"] { display: flex !important; justify-content: center !important; }
-body:has(#gw-launch-anchor) [data-testid="stImage"] img {
-    border-radius: 16px !important;
-    border: 1px solid rgba(201,162,39,0.35) !important;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4) !important;
 }
 @keyframes gw-fade-up {
     from { opacity: 0; transform: translateY(10px); }
@@ -193,9 +190,9 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton {
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button {
     width: 100% !important;
-    border-radius: 12px !important;
+    border-radius: 14px !important;
     font-weight: 600 !important;
-    min-height: 3.1rem !important;
+    min-height: 3.15rem !important;
     font-size: 1rem !important;
     opacity: 1 !important;
     visibility: visible !important;
@@ -219,8 +216,8 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kin
     -webkit-text-fill-color: #ffffff !important;
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] {
-    background: rgba(15,23,42,0.5) !important;
-    border: 2px solid rgba(248,250,252,0.65) !important;
+    background: transparent !important;
+    border: 2px solid rgba(255,255,255,0.85) !important;
     box-shadow: none !important;
 }
 
@@ -258,11 +255,11 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown span,
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown div {
     color: #faf6f1 !important;
 }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-kicker { color: #c9a88a !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-title { color: #faf6f1 !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-sub { color: #e8ddd4 !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-hint { color: #a89888 !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown strong { color: #fff8f0 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-kicker { color: #c9a227 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-title { color: #ffffff !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-sub { color: rgba(255,255,255,0.9) !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-hint { color: rgba(255,255,255,0.82) !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown strong { color: #ffffff !important; }
 
 /* Login: fundo claro como antes + faixa com tipografia marrom */
 body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stApp {
@@ -808,36 +805,27 @@ def carregar_produtos_ui() -> tuple[list, str]:
     return produtos_padrao(), "catalogo_embutido"
 
 
-def _imagem_entrada_path() -> Path:
-    """PNG da tela de boas-vindas — substitua por versão recortada (só o cartão) se quiser."""
-    return Path(__file__).resolve().parent / "assets" / "gramadoway_entrada.png"
-
-
 def _render_launch_splash() -> None:
-    """Primeira visita: imagem em assets/gramadoway_entrada.png ou cartão HTML de reserva."""
+    """Primeira visita: cartão em HTML (sem imagem) — estilo Gramadoway."""
     st.markdown('<div id="gw-launch-anchor" aria-hidden="true"></div>', unsafe_allow_html=True)
-    img_entrada = _imagem_entrada_path()
-    if img_entrada.is_file():
-        st.image(str(img_entrada), use_container_width=True)
-    else:
-        st.markdown(
-            """
-            <div class="gw-launch-shell">
-              <div class="gw-launch-inner">
-                <div class="gw-launch-mark" aria-hidden="true">
-                  <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="10" y="14" width="36" height="28" rx="6" stroke="#C9A227" stroke-width="2" fill="none"/>
-                    <path d="M18 26 L28 33 L38 26" stroke="#c9a88a" stroke-width="2" stroke-linecap="round" fill="none"/>
-                  </svg>
-                </div>
-                <p class="gw-launch-kicker">Chocolates artesanais</p>
-                <h1 class="gw-launch-title">Gramadoway</h1>
-                <p class="gw-launch-sub">Sistema de orçamento • <strong>Entrar</strong> ou <strong>criar conta</strong></p>
-              </div>
+    st.markdown(
+        """
+        <div class="gw-launch-shell">
+          <div class="gw-launch-inner">
+            <div class="gw-launch-mark" aria-hidden="true">
+              <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="9" y="15" width="38" height="26" rx="5" stroke="#C9A227" stroke-width="2" fill="none"/>
+                <path d="M9 18 L28 30 L47 18" stroke="#C9A227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            <p class="gw-launch-kicker">Chocolates artesanais</p>
+            <h1 class="gw-launch-title">Gramadoway</h1>
+            <p class="gw-launch-sub">Sistema de orçamento • <strong>Entrar</strong> ou <strong>criar conta</strong></p>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown(
         '<p class="gw-launch-hint">Toque num dos botões abaixo para continuar</p>',
         unsafe_allow_html=True,
