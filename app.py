@@ -3,10 +3,18 @@
 Sistema de Pedidos Gramadoway — Potente, robusto e grandioso
 Design inspirado em formulários profissionais de chocolates artesanais.
 """
+import json
+
 import streamlit as st
+import streamlit.components.v1 as components
 from pathlib import Path
 import pandas as pd
 from datetime import datetime
+
+try:
+    from streamlit_lottie import st_lottie
+except ImportError:  # pragma: no cover
+    st_lottie = None  # type: ignore
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
@@ -30,6 +38,45 @@ from utils import mascara_cnpj, mascara_telefone, mascara_cep, formatar_moeda, a
 from busca_inteligente import buscar_produtos, parsear_atalho
 import auth
 
+_APP_DIR = Path(__file__).resolve().parent
+
+# Som suave (Web Audio) — iframe 0px após clicar "Entrar no sistema"
+GW_CHIME_HTML = """
+<!DOCTYPE html><html><body style="margin:0;padding:0;overflow:hidden;">
+<script>
+(function () {
+  try {
+    var C = new (window.AudioContext || window.webkitAudioContext)();
+    var o = C.createOscillator();
+    var g = C.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(392, C.currentTime);
+    o.frequency.exponentialRampToValueAtTime(523.25, C.currentTime + 0.08);
+    o.frequency.exponentialRampToValueAtTime(659.25, C.currentTime + 0.2);
+    g.gain.setValueAtTime(0.0001, C.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.065, C.currentTime + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, C.currentTime + 0.42);
+    o.connect(g);
+    g.connect(C.destination);
+    o.start();
+    o.stop(C.currentTime + 0.45);
+  } catch (e) {}
+})();
+</script>
+</body></html>
+"""
+
+
+def _welcome_lottie_dict():
+    p = _APP_DIR / "assets" / "welcome_sparkle.json"
+    if not p.is_file():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
 st.set_page_config(
     page_title="Gramadoway — Formulário de Pedido",
     layout="wide",
@@ -39,7 +86,7 @@ st.set_page_config(
 # CSS — Letras fortes, grossas, bem visíveis (font-weight 600–700)
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
     --ouro: #C9A227;
@@ -52,15 +99,168 @@ st.markdown("""
     --fundo-escuro: #1a1410;
     --fundo-card: #2d2218;
     --fundo-page: #FAF7F2;
-    --texto-primary: #1a1410;
-    --texto-secondary: #4a3f35;
-    --texto-muted: #6b5d52;
+    --texto-primary: #120d0a;
+    --texto-secondary: #2d241c;
+    --texto-muted: #4a3f36;
     --borda: #d4c4a8;
     --borda-ouro: rgba(201,162,39,0.5);
     --borda-focus: var(--ouro);
-    --sombra-sm: 0 2px 4px rgba(61,41,20,0.08);
-    --sombra-md: 0 4px 12px rgba(61,41,20,0.12), 0 2px 4px rgba(201,162,39,0.06);
-    --sombra-lg: 0 12px 24px rgba(61,41,20,0.15), 0 4px 8px rgba(201,162,39,0.08);
+    --sombra-sm: 0 2px 6px rgba(61,41,20,0.07);
+    --sombra-md: 0 6px 20px rgba(61,41,20,0.1), 0 2px 8px rgba(201,162,39,0.08);
+    --sombra-lg: 0 16px 40px rgba(61,41,20,0.14), 0 6px 16px rgba(201,162,39,0.1);
+    --sombra-press: inset 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* ========== Launch / boas-vindas ========== */
+#gw-launch-anchor { position: absolute; width: 0; height: 0; pointer-events: none; }
+body:has(#gw-launch-anchor) [data-testid="stHeader"] { display: none !important; }
+body:has(#gw-launch-anchor) [data-testid="stSidebar"] { display: none !important; }
+body:has(#gw-launch-anchor) .stMainBlockContainer { padding-top: 0.5rem !important; max-width: 100% !important; }
+
+.gw-launch-shell {
+    min-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem 3rem;
+    margin: -0.5rem -1rem 0 -1rem;
+    border-radius: 0 0 24px 24px;
+    background: linear-gradient(125deg, #1a0f0a 0%, #2d1f14 35%, #3d2914 55%, #1f1510 100%);
+    background-size: 200% 200%;
+    animation: gw-gradient-flow 10s ease infinite;
+    box-shadow: 0 24px 60px rgba(26,15,10,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+}
+.gw-launch-shell::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(201,162,39,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(229,212,161,0.08) 0%, transparent 45%);
+    pointer-events: none;
+    animation: gw-glow-pulse 5s ease-in-out infinite;
+}
+@keyframes gw-gradient-flow {
+    0%, 100% { background-position: 0% 40%; }
+    50% { background-position: 100% 60%; }
+}
+@keyframes gw-glow-pulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+}
+.gw-launch-inner { position: relative; z-index: 1; max-width: 520px; }
+.gw-launch-kicker {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(255,236,200,0.95) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    margin-bottom: 1rem;
+    animation: gw-fade-up 0.9s ease-out both;
+}
+.gw-launch-title {
+    font-family: 'Fraunces', Georgia, serif !important;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: #fff !important;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.35);
+    animation: gw-fade-up 0.9s ease-out 0.12s both;
+}
+.gw-launch-sub {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.96) !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    margin: 0 0 2rem 0;
+    line-height: 1.5;
+    animation: gw-fade-up 0.9s ease-out 0.22s both;
+}
+.gw-launch-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-bottom: 2rem;
+    animation: gw-fade-up 0.9s ease-out 0.35s both;
+}
+.gw-launch-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--ouro-claro), var(--ouro));
+    box-shadow: 0 0 12px rgba(201,162,39,0.6);
+    animation: gw-dot-bounce 1.2s ease-in-out infinite;
+}
+.gw-launch-dot:nth-child(2) { animation-delay: 0.15s; }
+.gw-launch-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes gw-dot-bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+    40% { transform: translateY(-10px); opacity: 1; }
+}
+.gw-launch-bar {
+    height: 3px;
+    width: min(280px, 85vw);
+    margin: 0 auto 1.75rem;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.12);
+    overflow: hidden;
+    animation: gw-fade-up 0.9s ease-out 0.4s both;
+}
+.gw-launch-bar > span {
+    display: block;
+    height: 100%;
+    width: 40%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, transparent, var(--ouro), var(--ouro-claro), transparent);
+    animation: gw-bar-shine 1.8s ease-in-out infinite;
+}
+@keyframes gw-bar-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(350%); }
+}
+@keyframes gw-fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.gw-launch-hint {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: rgba(255,245,220,0.72) !important;
+    margin-top: 1.25rem;
+    animation: gw-fade-up 0.9s ease-out 0.5s both;
+}
+.gw-lottie-slot {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: -0.5rem auto 0.25rem !important;
+    min-height: 188px;
+}
+.gw-launch-footer {
+    text-align: center;
+    padding: 0 1rem 0.5rem;
+    margin: 0 auto;
+    max-width: 520px;
+}
+
+/* Cartão login — após launch */
+.gw-login-card {
+    background: linear-gradient(165deg, rgba(255,255,255,0.97) 0%, var(--creme) 100%);
+    border: 1px solid var(--borda);
+    border-radius: 18px;
+    padding: 1.75rem 1.5rem 2rem;
+    margin: 1.25rem auto 2rem;
+    max-width: 520px;
+    box-shadow: var(--sombra-lg);
 }
 
 
@@ -68,9 +268,9 @@ st.markdown("""
 section[data-testid="stMain"], section[data-testid="stMain"] button, section[data-testid="stMain"] input,
 section[data-testid="stMain"] textarea, section[data-testid="stMain"] label {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
-    -webkit-font-smoothing: antialiased !important;
-    -moz-osx-font-smoothing: grayscale !important;
-    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: subpixel-antialiased !important;
+    -moz-osx-font-smoothing: auto !important;
+    text-rendering: geometricPrecision !important;
 }
 section[data-testid="stMain"] .stMarkdown, section[data-testid="stMain"] p,
 section[data-testid="stMain"] span:not([class*="material"]):not([data-testid="stIconMaterial"]) {
@@ -85,10 +285,35 @@ section[data-testid="stMain"] label {
 }
 section[data-testid="stMain"] .stCaption, section[data-testid="stMain"] [data-testid="stCaption"],
 section[data-testid="stMain"] [data-testid="stCaption"] * {
-    font-weight: 400 !important; color: var(--texto-secondary) !important; font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    color: var(--texto-secondary) !important;
+    font-size: 0.8125rem !important;
+    opacity: 1 !important;
+}
+/* Alertas — texto nítido (evita “apagado”) */
+[data-testid="stAlert"] {
+    border: 1px solid rgba(201,162,39,0.35) !important;
+    box-shadow: var(--sombra-sm) !important;
+}
+[data-testid="stAlert"] p, [data-testid="stAlert"] div, [data-testid="stAlert"] span {
+    color: var(--texto-primary) !important;
+    font-weight: 500 !important;
+    -webkit-font-smoothing: subpixel-antialiased !important;
+}
+/* Tabs — rótulos mais legíveis */
+.stTabs [data-baseweb="tab"] span, .stTabs [data-baseweb="tab"] p {
+    font-weight: 600 !important;
+    color: var(--texto-secondary) !important;
 }
 section[data-testid="stMain"] .stTextInput input, section[data-testid="stMain"] .stTextArea textarea {
-    font-weight: 400 !important; color: var(--texto-primary) !important; font-size: 0.9375rem !important;
+    font-weight: 400 !important;
+    color: var(--texto-primary) !important;
+    font-size: 0.9375rem !important;
+    letter-spacing: 0.01em !important;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+section[data-testid="stMain"] .stTextInput input:focus, section[data-testid="stMain"] .stTextArea textarea:focus {
+    box-shadow: 0 0 0 3px rgba(201,162,39,0.2) !important;
 }
 section[data-testid="stMain"] .stTextInput input::placeholder,
 section[data-testid="stMain"] .stTextArea textarea::placeholder {
@@ -307,7 +532,25 @@ div[data-testid="stDataFrameResizable"] td, div[data-testid="stDataFrameResizabl
 }
 .stButton > button:hover {
     box-shadow: var(--sombra-lg) !important;
-    transform: translateY(-1px) !important;
+    transform: translateY(-2px) !important;
+}
+.stButton > button:active {
+    transform: translateY(0) scale(0.98) !important;
+    box-shadow: var(--sombra-press), 0 4px 14px rgba(201,162,39,0.25) !important;
+    transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+}
+.stDownloadButton > button {
+    transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+}
+.stDownloadButton > button:hover {
+    box-shadow: var(--sombra-lg) !important;
+    transform: translateY(-2px) !important;
+}
+.stDownloadButton > button:active {
+    transform: scale(0.98) !important;
+    box-shadow: var(--sombra-press) !important;
 }
 
 /* Esconder info boxes feios — usar mensagem customizada */
@@ -482,6 +725,74 @@ def carregar_produtos_ui() -> tuple[list, str]:
     return produtos_padrao(), "catalogo_embutido"
 
 
+def _render_launch_splash() -> None:
+    """Primeira visita na sessão: Lottie + boas-vindas antes do login."""
+    st.markdown('<div id="gw-launch-anchor" aria-hidden="true"></div>', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="gw-launch-shell">
+          <div class="gw-launch-inner">
+            <p class="gw-launch-kicker">Chocolates artesanais</p>
+            <h1 class="gw-launch-title">Seja bem-vindo</h1>
+            <p class="gw-launch-sub">A carregar o sistema de pedidos e orçamentos.<br/>Tudo pronto num instante.</p>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    lottie = _welcome_lottie_dict()
+    _, c1, _ = st.columns([1, 2.2, 1])
+    with c1:
+        st.markdown('<div class="gw-lottie-slot">', unsafe_allow_html=True)
+        if lottie and st_lottie is not None:
+            try:
+                st_lottie(
+                    lottie,
+                    speed=1,
+                    reverse=False,
+                    loop=True,
+                    quality="high",
+                    height=180,
+                    width=180,
+                    key="gw_welcome_lottie",
+                )
+            except Exception:
+                st.markdown(
+                    '<div class="gw-launch-loader" style="justify-content:center;padding:1rem 0;">'
+                    '<span class="gw-launch-dot"></span><span class="gw-launch-dot"></span><span class="gw-launch-dot"></span>'
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
+        else:
+            st.markdown(
+                '<div class="gw-launch-loader" style="justify-content:center;padding:1rem 0;">'
+                '<span class="gw-launch-dot"></span><span class="gw-launch-dot"></span><span class="gw-launch-dot"></span>'
+                "</div>",
+                unsafe_allow_html=True,
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="gw-launch-footer">
+            <div class="gw-launch-bar" aria-hidden="true"><span></span></div>
+            <p class="gw-launch-hint">Gramadoway • Lottie + som ao entrar</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    _, col_btn, _ = st.columns([1, 1.15, 1])
+    with col_btn:
+        if st.button(
+            "Entrar no sistema",
+            type="primary",
+            use_container_width=True,
+            key="gw_btn_entrar_launch",
+        ):
+            st.session_state["gw_splash_done"] = True
+            st.session_state["_gw_play_chime"] = True
+            st.rerun()
+
+
 def _render_login():
     """Link público: cada pessoa cria o próprio usuário ou entra se já tiver cadastro."""
     st.markdown("### Gramadoway — Acesso")
@@ -529,8 +840,14 @@ def _render_login():
 
 
 def main():
+    if st.session_state.pop("_gw_play_chime", None):
+        components.html(GW_CHIME_HTML, height=0, width=0)
+
     usuario = st.session_state.get(auth.SESSION_KEY)
     if not usuario:
+        if not st.session_state.get("gw_splash_done"):
+            _render_launch_splash()
+            return
         _render_login()
         return
 

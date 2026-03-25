@@ -27,7 +27,7 @@ st.set_page_config(
 # CSS — BI profissional, tema escuro, precisão visual
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
     --bi-azul: #3b82f6;
@@ -39,8 +39,8 @@ st.markdown("""
     --bi-card: #1e293b;
     --bi-card-hover: #334155;
     --bi-borda: #334155;
-    --bi-texto: #f1f5f9;
-    --bi-texto-sec: #94a3b8;
+    --bi-texto: #f8fafc;
+    --bi-texto-sec: #cbd5e1;
 }
 
 .stApp { background: var(--bi-fundo) !important; }
@@ -48,7 +48,9 @@ st.markdown("""
 section[data-testid="stMain"], section[data-testid="stMain"] button,
 section[data-testid="stMain"] input, section[data-testid="stMain"] label {
     font-family: 'Inter', -apple-system, sans-serif !important;
-    -webkit-font-smoothing: antialiased !important;
+    -webkit-font-smoothing: subpixel-antialiased !important;
+    -moz-osx-font-smoothing: auto !important;
+    text-rendering: geometricPrecision !important;
 }
 
 /* Header premium */
@@ -62,13 +64,14 @@ section[data-testid="stMain"] input, section[data-testid="stMain"] label {
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 .dash-header h1 {
+    font-family: 'Fraunces', Georgia, serif !important;
     font-size: 2.2rem;
     font-weight: 700;
     color: var(--bi-texto) !important;
     margin: 0;
     letter-spacing: 0.04em;
 }
-.dash-header .sub { color: var(--bi-texto-sec); font-size: 1rem; margin-top: 0.5rem; font-weight: 500; }
+.dash-header .sub { color: var(--bi-texto-sec); font-size: 1rem; margin-top: 0.5rem; font-weight: 600; opacity: 1; }
 
 /* KPI Cards — estilo primeira linha */
 .kpi-card {
@@ -91,8 +94,8 @@ section[data-testid="stMain"] input, section[data-testid="stMain"] label {
 .kpi-card.roxo { border-left: 4px solid var(--bi-roxo); }
 .kpi-card.amber { border-left: 4px solid var(--bi-amber); }
 .kpi-card .valor { font-size: 1.8rem; font-weight: 700; color: var(--bi-texto); }
-.kpi-card .label { font-size: 0.85rem; color: var(--bi-texto-sec); margin-top: 0.4rem; font-weight: 500; }
-.kpi-card .sub { font-size: 0.75rem; color: var(--bi-texto-sec); margin-top: 0.2rem; opacity: 0.9; }
+.kpi-card .label { font-size: 0.85rem; color: var(--bi-texto-sec); margin-top: 0.4rem; font-weight: 600; }
+.kpi-card .sub { font-size: 0.75rem; color: var(--bi-texto-sec); margin-top: 0.2rem; opacity: 1; font-weight: 500; }
 
 /* Chart containers */
 .chart-box {
@@ -115,6 +118,26 @@ section[data-testid="stMain"] input, section[data-testid="stMain"] label {
 
 /* Botão voltar sem ícone problemático */
 .stPageLink { margin-bottom: 1rem !important; }
+
+section[data-testid="stMain"] .stButton > button {
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease !important;
+}
+section[data-testid="stMain"] .stButton > button:hover {
+    filter: brightness(1.08) !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35) !important;
+}
+section[data-testid="stMain"] .stButton > button:active {
+    transform: scale(0.98) !important;
+}
+
+[data-testid="stCaptionContainer"] { opacity: 1 !important; }
+[data-testid="stCaptionContainer"] p, [data-testid="stCaptionContainer"] span,
+[data-testid="stCaptionContainer"] label {
+    color: var(--bi-texto-sec) !important;
+    font-weight: 500 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
