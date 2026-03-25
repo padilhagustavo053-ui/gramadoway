@@ -1,0 +1,19 @@
+GRAMADOWAY — pasta sincronizada com o projeto completo (Cursor)
+================================================================
+
+O que esta pasta TEM agora (para o Streamlit / GitHub):
+- app.py + produtos_catalogo.py (catálogo embutido + UI nova)
+- db_store.py + auth/historico/config_paths (base de dados opcional)
+- pages/1_Dashboard.py
+- data/planilha.xlsx + data/README.txt
+- scripts/ e supabase/
+- requirements.txt (streamlit, psycopg2-binary, etc.)
+- .gitignore (permite commit de data/planilha.xlsx)
+
+O que TU fazes em 2 passos:
+1) GitHub Desktop → Commit ALL → Push (main)
+2) Streamlit Cloud → Redeploy / Reboot da app
+
+Link para partilhar: o .streamlit.app do painel Streamlit
+
+Secrets opcional: GRAMADOWAY_DATABASE_URL (Supabase) para não perder logins/pedidos.

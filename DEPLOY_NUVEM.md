@@ -18,17 +18,30 @@ O app foi preparado para rodar no **Streamlit Community Cloud** (grátis) ou em 
    - **Main file path:** `gramadoway_sistema/app.py` (ajuste se a pasta tiver outro nome).  
    - **Branch:** `main` (ou a que você usar).
 
-3. **Planilha na nuvem** (escolha uma):  
-   - **Mais simples:** abra o app e use **“Enviar Excel (.xlsx)”**. Cada sessão pode precisar reenviar após o app “dormir” no plano gratuito.  
-   - **Mais estável:** inclua `data/planilha.xlsx` no repositório (repositório **privado** se os preços forem confidenciais) e faça deploy de novo após cada atualização de preços.
+3. **Planilha na nuvem**  
+   - O projeto inclui **`data/planilha.xlsx`** (produtos de **exemplo**) para o Streamlit já mostrar o formulário sem upload.  
+   - Troque por sua planilha real (mesmo caminho e nome), commit e redeploy — ou use **“Enviar Excel”** no app.  
+   - Preços confidenciais: repósitorio **privado** ou só upload na sessão.
 
-4. **Secrets (opcional)**  
+4. **Secrets**  
    - No painel do app: **Settings → Secrets**.  
-   - Copie o modelo de `.streamlit/secrets.toml.example` se quiser definir caminhos fixos.
+   - Veja o modelo em `.streamlit/secrets.toml.example` (planilha, caminhos, **base de dados**).
 
-5. **Histórico e logins**  
-   - No plano gratuito do Streamlit Cloud o disco é **reiniciado** quando o app hiberna ou é redeployado. Usuários e pedidos salvos só em arquivo **podem sumir**.  
-   - Para produção séria, use banco externo (Supabase, etc.) — isso é um passo extra.
+5. **Persistência na nuvem (recomendado) — PostgreSQL / Supabase**  
+   Sem banco, no Streamlit grátis o disco **volátil** pode apagar usuários e pedidos após hibernar ou redeployar.  
+   Com **`GRAMADOWAY_DATABASE_URL`** os dados ficam na base **sempre ligada** (você não mantém servidor).
+
+   **Passos resumidos (Supabase grátis):**  
+   1. Crie um projeto em [supabase.com](https://supabase.com).  
+   2. **Project Settings → Database → Connection string → URI** (modo *Session* ou conexão **direta** porta `5432`).  
+   3. Copie a URI com a **senha** da base (não commite no Git).  
+   4. No Streamlit Cloud: **Settings → Secrets** e adicione por exemplo:  
+      `GRAMADOWAY_DATABASE_URL = "postgresql://postgres...."`  
+   5. Faça **Redeploy** do app. Na primeira execução as tabelas são criadas sozinhas (ou rode `supabase/schema.sql` no **SQL Editor** do Supabase).  
+   6. **Importante:** ao ativar a URL, **novos** logins/pedidos vão para a BD. Dados antigos só em `data/` no disco **não** migram automaticamente — trate como instalação nova ou migre manualmente.
+
+6. **Histórico e logins só em arquivo (sem URL)**  
+   - Continua válido para testes locais; na nuvem grátis pode **perder** dados conforme o item 5.
 
 ## Opção B — Seu próprio servidor / Docker
 
@@ -45,7 +58,9 @@ Defina `GRAMADOWAY_DATA_DIR` apontando para uma pasta **persistente** no servido
 | Variável | Uso |
 |----------|-----|
 | `GRAMADOWAY_PLANILHA` | Caminho absoluto do `.xlsx` |
-| `GRAMADOWAY_DATA_DIR` | Onde ficam `usuarios/`, `users/` e dados por login |
+| `GRAMADOWAY_DATA_DIR` | Onde ficam `usuarios/`, `users/` e dados por login (se **não** usar BD) |
+| `GRAMADOWAY_DATABASE_URL` | URI PostgreSQL (Supabase, Neon, etc.) — **persiste** usuários e JSON por login |
+| `SUPABASE_DB_URL` | Alias opcional da mesma URI |
 
 ## Depois do deploy
 

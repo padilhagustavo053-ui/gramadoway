@@ -15,6 +15,10 @@ from config_paths import (
     inject_streamlit_secrets_into_environ,
     migrate_legacy_pedidos_folder,
 )
+
+inject_streamlit_secrets_into_environ()
+migrate_legacy_pedidos_folder()
+
 from extrair import extrair_todos, extrair_todos_de_bytes, _caminho_planilha
 from api_client import obter_url_api, carregar_produtos_api
 from historico import (
@@ -25,9 +29,6 @@ from historico import (
 from utils import mascara_cnpj, mascara_telefone, mascara_cep, formatar_moeda, aplicar_totais_pedido
 from busca_inteligente import buscar_produtos, parsear_atalho
 import auth
-
-inject_streamlit_secrets_into_environ()
-migrate_legacy_pedidos_folder()
 
 st.set_page_config(
     page_title="Gramadoway — Formulário de Pedido",
@@ -63,25 +64,34 @@ st.markdown("""
 }
 
 
-* {
+/* Tipografia só na área principal — NÃO usar * global (quebra ícones Material na sidebar multipage) */
+section[data-testid="stMain"], section[data-testid="stMain"] button, section[data-testid="stMain"] input,
+section[data-testid="stMain"] textarea, section[data-testid="stMain"] label {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
     text-rendering: optimizeLegibility !important;
 }
-/* Hierarquia tipográfica — padrão SaaS (Inter, Figma/Linear) */
-.stMarkdown, p, span { font-weight: 400 !important; color: var(--texto-primary) !important; }
+section[data-testid="stMain"] .stMarkdown, section[data-testid="stMain"] p,
+section[data-testid="stMain"] span:not([class*="material"]):not([data-testid="stIconMaterial"]) {
+    font-weight: 400 !important;
+    color: var(--texto-primary) !important;
+}
 /* Logo: título branco — override qualquer herança */
 .logo-container h1, div.logo-container h1, .logo-container > h1 { color: #ffffff !important; }
-.stMarkdown strong { font-weight: 600 !important; }
-label { font-weight: 500 !important; color: var(--texto-primary) !important; font-size: 0.875rem !important; }
-.stCaption, [data-testid="stCaption"], [data-testid="stCaption"] * {
+section[data-testid="stMain"] .stMarkdown strong { font-weight: 600 !important; }
+section[data-testid="stMain"] label {
+    font-weight: 500 !important; color: var(--texto-primary) !important; font-size: 0.875rem !important;
+}
+section[data-testid="stMain"] .stCaption, section[data-testid="stMain"] [data-testid="stCaption"],
+section[data-testid="stMain"] [data-testid="stCaption"] * {
     font-weight: 400 !important; color: var(--texto-secondary) !important; font-size: 0.8125rem !important;
 }
-.stTextInput input, .stTextArea textarea {
+section[data-testid="stMain"] .stTextInput input, section[data-testid="stMain"] .stTextArea textarea {
     font-weight: 400 !important; color: var(--texto-primary) !important; font-size: 0.9375rem !important;
 }
-.stTextInput input::placeholder, .stTextArea textarea::placeholder {
+section[data-testid="stMain"] .stTextInput input::placeholder,
+section[data-testid="stMain"] .stTextArea textarea::placeholder {
     font-weight: 400 !important; color: var(--texto-muted) !important;
 }
 
@@ -303,13 +313,30 @@ div[data-testid="stDataFrameResizable"] td, div[data-testid="stDataFrameResizabl
 /* Esconder info boxes feios — usar mensagem customizada */
 [data-testid="stAlert"] { border-radius: 12px !important; }
 
-/* Sidebar */
+/* Sidebar — navegação multipage legível, sem sobrepor ícones/texto */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #fffefb 0%, var(--creme) 100%) !important;
     border-right: 1px solid var(--borda) !important;
     box-shadow: 4px 0 12px rgba(61,41,20,0.06) !important;
 }
+[data-testid="stSidebar"] [data-testid="stSidebarNavLink"] {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    min-height: 2.25rem !important;
+    padding: 0.35rem 0.5rem !important;
+    margin-bottom: 0.15rem !important;
+    border-radius: 8px !important;
+    line-height: 1.35 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+}
+[data-testid="stSidebar"] [data-testid="stSidebarNavSeparator"] {
+    margin: 0.75rem 0 !important;
+}
 [data-testid="stSidebar"] .stMarkdown { color: var(--texto-primary) !important; }
+[data-testid="stSidebar"] .stMarkdown p { margin-bottom: 0.5rem !important; }
+[data-testid="stSidebar"] .element-container { margin-bottom: 0.5rem !important; }
 
 .data-source {
     font-size: 0.8125rem;
@@ -317,6 +344,24 @@ div[data-testid="stDataFrameResizable"] td, div[data-testid="stDataFrameResizabl
     margin-bottom: 1rem;
     font-weight: 500;
 }
+
+/* Caixa amigável — falta planilha */
+.planilha-missing-box {
+    background: linear-gradient(180deg, #fff9e6 0%, #fff3cc 100%);
+    border: 1px solid var(--ouro);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0 1.25rem 0;
+    box-shadow: var(--sombra-md);
+}
+.planilha-missing-box h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--chocolate);
+}
+.planilha-missing-box ol { margin: 0.5rem 0 0 1.1rem; padding: 0; color: var(--texto-primary); line-height: 1.65; }
+.planilha-missing-box li { margin-bottom: 0.35rem; }
 
 /* Abas — chocolates: fundo creme, bordas douradas, sombras */
 .stTabs [data-baseweb="tab-list"] {
@@ -409,43 +454,71 @@ def _carregar_produtos_arquivo(path_resolvido: str) -> list:
 
 
 def carregar_produtos_ui() -> tuple[list, str]:
-    """Se GRAMADOWAY_API_URL estiver definida, busca produtos na API; senão disco/upload."""
+    """API → upload sessão → planilha em disco → catálogo embutido (sempre há produtos)."""
     if obter_url_api():
         try:
-            return carregar_produtos_api()
+            prod, src = carregar_produtos_api()
+            if prod:
+                return prod, src
         except Exception as e:
-            st.error(f"Erro ao falar com a API: {e}")
-            return [], ""
+            st.warning(f"API indisponível — a usar catálogo embutido. ({e})")
     blob = st.session_state.get("_planilha_bytes")
     if blob:
         try:
             return extrair_todos_de_bytes(blob), "upload_sessao.xlsx"
         except Exception as e:
-            st.error(f"Erro ao ler planilha enviada: {e}")
-            return [], ""
+            st.error(f"Erro ao ler o Excel enviado: {e}")
     try:
         path = _caminho_planilha()
         prod = _carregar_produtos_arquivo(str(path.resolve()))
-        return prod, str(path)
+        if prod:
+            return prod, str(path)
     except FileNotFoundError:
-        return [], ""
+        pass
+    except Exception:
+        pass
+    from produtos_catalogo import produtos_padrao
+
+    return produtos_padrao(), "catalogo_embutido"
 
 
 def _render_login():
-    """Tela inicial: primeiro usuário ou login."""
+    """Link público: cada pessoa cria o próprio usuário ou entra se já tiver cadastro."""
     st.markdown("### Gramadoway — Acesso")
-    if not auth.tem_usuarios():
-        st.info("Primeiro acesso: crie o usuário principal (ex.: vendedor ou admin).")
-        with st.form("primeiro_usuario"):
-            nu = st.text_input("Login", placeholder="ex: maria_vendas", help="3–32 caracteres: letras minúsculas, números e _")
-            p1 = st.text_input("Senha", type="password")
-            p2 = st.text_input("Repita a senha", type="password")
-            if st.form_submit_button("Criar e entrar"):
+    st.info(
+        "Quem recebe o **link** pode usar o sistema por aqui. "
+        "Não há senha para “abrir o site”: em **Criar minha conta** você escolhe login e senha **só seus**. "
+        "Se já se cadastrou antes, use **Entrar**."
+    )
+    tab_entrar, tab_criar = st.tabs(["Entrar", "Criar minha conta"])
+    with tab_entrar:
+        with st.form("form_login_publico"):
+            lg = st.text_input("Usuário", placeholder="seu login", key="pub_login_user")
+            pw = st.text_input("Senha", type="password", key="pub_login_pw")
+            if st.form_submit_button("Entrar"):
+                u = auth.verificar_login(lg, pw)
+                if u:
+                    st.session_state[auth.SESSION_KEY] = u
+                    st.session_state.pop("df_pedido", None)
+                    st.rerun()
+                else:
+                    st.error("Usuário ou senha incorretos.")
+    with tab_criar:
+        with st.form("form_cadastro_publico"):
+            nu = st.text_input(
+                "Escolha seu login",
+                placeholder="ex: joao_vendas",
+                help="3 a 32 caracteres: letras minúsculas, números e _",
+                key="pub_reg_login",
+            )
+            p1 = st.text_input("Senha (mín. 6 caracteres)", type="password", key="pub_reg_p1")
+            p2 = st.text_input("Repita a senha", type="password", key="pub_reg_p2")
+            if st.form_submit_button("Criar conta e entrar"):
                 if p1 != p2:
                     st.error("As senhas não coincidem.")
                 else:
                     try:
-                        auth.registrar_primeiro_usuario(nu, p1)
+                        auth.registrar_usuario(nu, p1)
                         u = auth.verificar_login(nu, p1)
                         if u:
                             st.session_state[auth.SESSION_KEY] = u
@@ -453,18 +526,6 @@ def _render_login():
                             st.rerun()
                     except Exception as e:
                         st.error(str(e))
-        return
-    with st.form("login"):
-        lg = st.text_input("Usuário", placeholder="seu login")
-        pw = st.text_input("Senha", type="password")
-        if st.form_submit_button("Entrar"):
-            u = auth.verificar_login(lg, pw)
-            if u:
-                st.session_state[auth.SESSION_KEY] = u
-                st.session_state.pop("df_pedido", None)
-                st.rerun()
-            else:
-                st.error("Usuário ou senha incorretos.")
 
 
 def main():
@@ -480,20 +541,7 @@ def main():
             st.session_state.pop(auth.SESSION_KEY, None)
             st.session_state.pop("df_pedido", None)
             st.rerun()
-        with st.expander("Cadastrar usuário"):
-            with st.form("reg_sidebar"):
-                nu = st.text_input("Login do colega", key="sb_reg_l")
-                p1 = st.text_input("Senha", type="password", key="sb_reg_p1")
-                p2 = st.text_input("Repita", type="password", key="sb_reg_p2")
-                if st.form_submit_button("Cadastrar"):
-                    if p1 != p2:
-                        st.error("Senhas diferentes.")
-                    else:
-                        try:
-                            auth.registrar_usuario(nu, p1)
-                            st.success("Usuário criado.")
-                        except Exception as e:
-                            st.error(str(e))
+        st.caption("Novos colegas: envie o **mesmo link** do sistema — cada um cria a conta em *Criar minha conta*.")
         st.markdown("---")
         if "df_pedido" in st.session_state:
             n_itens = int((st.session_state.df_pedido["Qtde"] > 0).sum())
@@ -553,15 +601,34 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("##### Planilha de preços")
-    dr = data_root()
-    api_u = obter_url_api()
-    if api_u:
-        st.success(f"Produtos vêm da **API**: `{api_u}` — envie a planilha pelo Swagger em **/docs** (`POST /v1/planilha`) ou mantenha `data/planilha.xlsx` no servidor da API.")
+    with st.spinner("Carregando produtos..."):
+        produtos, path_planilha = carregar_produtos_ui()
+
+    src_prod = str(path_planilha or "")
+    if src_prod == "catalogo_embutido":
+        st.success(
+            "**Catálogo Gramadoway** carregado — já pode orçar. "
+            "Preços de **referência**; para a sua planilha oficial, abra **Substituir planilha** abaixo."
+        )
+    elif src_prod.startswith("http"):
+        st.caption(f"Produtos da **API**: `{src_prod}`")
+    elif src_prod == "upload_sessao.xlsx":
+        st.caption("A usar o **Excel que enviou** nesta sessão.")
     else:
+        nome_src = (
+            Path(src_prod).name
+            if src_prod and ("/" in src_prod or "\\" in src_prod)
+            else (src_prod or "—")
+        )
+        st.markdown(
+            f'<p class="data-source">Preços: <strong>{nome_src}</strong></p>',
+            unsafe_allow_html=True,
+        )
+
+    with st.expander("Substituir planilha de preços (.xlsx) — opcional", expanded=False):
         st.caption(
-            f"**Modo direto:** coloque o `.xlsx` em `{dr}` (ex.: `planilha.xlsx`) ou envie abaixo. "
-            f"**Modo API (opcional):** defina `GRAMADOWAY_API_URL` e suba a API — veja `GUIA_API.md`."
+            "Se tiver o Excel oficial Gramadoway, envie aqui. "
+            "Senão, o catálogo embutido continua ativo. Ficheiro em `data/planilha.xlsx` no projeto também é usado automaticamente."
         )
         c_up, c_lim = st.columns([2, 1])
         with c_up:
@@ -569,29 +636,19 @@ def main():
             if arq is not None:
                 st.session_state["_planilha_bytes"] = arq.getvalue()
                 st.session_state.pop("df_pedido", None)
+                st.cache_data.clear()
+                st.rerun()
         with c_lim:
-            if st.session_state.get("_planilha_bytes") and st.button("Usar arquivo da pasta data/", key="gw_clear_upload"):
+            if st.session_state.get("_planilha_bytes") and st.button(
+                "Remover upload e voltar ao catálogo/disco", key="gw_clear_upload"
+            ):
                 st.session_state.pop("_planilha_bytes", None)
                 st.session_state.pop("df_pedido", None)
                 st.cache_data.clear()
                 st.rerun()
-
-    with st.spinner("Carregando produtos..."):
-        produtos, path_planilha = carregar_produtos_ui()
-    if not produtos:
-        st.warning(
-            "Nenhuma planilha encontrada. Envie um .xlsx acima ou copie o arquivo para a pasta **data** "
-            f"do projeto (`{dr}`) e clique em Recarregar."
-        )
-        if st.button("Recarregar"):
+        if st.button("Recarregar lista de produtos", key="gw_reload_prod"):
             st.cache_data.clear()
             st.rerun()
-        return
-
-    nome_arquivo = (
-        Path(path_planilha).name if ("/" in path_planilha or "\\" in path_planilha) else path_planilha
-    )
-    st.markdown(f'<p class="data-source">Dados: {nome_arquivo}</p>', unsafe_allow_html=True)
 
     # Seção CLIENTE — layout agrupado, máscaras, CEP, clientes recorrentes
     st.markdown('<div class="client-section">CLIENTE</div>', unsafe_allow_html=True)

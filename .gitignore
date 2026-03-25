@@ -1,5 +1,6 @@
-# Dados sensíveis — não enviar ao Git
+# Dados sensíveis — não enviar ao Git (exceto planilha padrão para deploy na nuvem)
 data/*.xlsx
+!data/planilha.xlsx
 data/*.XLSX
 data/usuarios/
 data/users/

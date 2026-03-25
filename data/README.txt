@@ -2,9 +2,8 @@ Pasta de dados do Gramadoway (local e nuvem)
 =============================================
 
 1) Planilha de preços
-   - Renomeie para planilha.xlsx e coloque AQUI, ou
-   - Use qualquer .xlsx com "gramadoway" no nome, ou
-   - No app, use "Enviar Excel" (útil no Streamlit Cloud).
+   - O app carrega um CATÁLOGO EMBUTIDO (57+ itens) se não houver .xlsx — abre e já orça.
+   - Opcional: planilha.xlsx aqui, upload na app, ou API — substituem o catálogo.
 
 2) Usuários e histórico
    - Subpastas usuarios/ e users/ são criadas automaticamente.

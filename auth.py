@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 from config_paths import data_root
+from db_store import db_enabled, registry_load, registry_sync_users
 
 _ITERATIONS = 310_000
 
@@ -33,6 +34,11 @@ def sanitize_login(login: str) -> str:
 
 
 def _load_registry() -> dict:
+    if db_enabled():
+        try:
+            return registry_load()
+        except Exception:
+            return {"version": 1, "users": []}
     p = registry_path()
     if not p.exists():
         return {"version": 1, "users": []}
@@ -46,6 +52,9 @@ def _load_registry() -> dict:
 
 
 def _save_registry(data: dict) -> None:
+    if db_enabled():
+        registry_sync_users(data.get("users", []))
+        return
     registry_path().write_text(
         json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
     )

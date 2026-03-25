@@ -11,11 +11,12 @@ from collections import defaultdict
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from config_paths import inject_streamlit_secrets_into_environ, migrate_legacy_pedidos_folder
-from historico import stats_dashboard
-import auth
 
 inject_streamlit_secrets_into_environ()
 migrate_legacy_pedidos_folder()
+
+from historico import stats_dashboard
+import auth
 
 st.set_page_config(
     page_title="Painel de Controle BI — Gramadoway",
@@ -43,7 +44,12 @@ st.markdown("""
 }
 
 .stApp { background: var(--bi-fundo) !important; }
-* { font-family: 'Inter', -apple-system, sans-serif !important; -webkit-font-smoothing: antialiased !important; }
+/* Só área principal — não forçar fonte na sidebar (ícones multipage) */
+section[data-testid="stMain"], section[data-testid="stMain"] button,
+section[data-testid="stMain"] input, section[data-testid="stMain"] label {
+    font-family: 'Inter', -apple-system, sans-serif !important;
+    -webkit-font-smoothing: antialiased !important;
+}
 
 /* Header premium */
 .dash-header {
@@ -184,12 +190,13 @@ def _faturamento_mes_atual(historico):
 def main():
     usuario = st.session_state.get(auth.SESSION_KEY)
     if not usuario:
-        st.warning("Faça login na página principal (Formulário) para ver o seu painel e histórico.")
-        st.page_link("app.py", label="Ir ao login")
+        st.warning("Abra a página principal (Formulário), use **Entrar** ou **Criar minha conta**.")
+        if st.button("Ir ao acesso / login", type="primary", use_container_width=True):
+            st.switch_page("app.py")
         st.stop()
 
-    # Botão Voltar — sem ícone (← não é emoji válido no Streamlit)
-    st.page_link("app.py", label="Voltar ao Formulário")
+    if st.button("← Voltar ao Formulário", key="dash_voltar_form"):
+        st.switch_page("app.py")
 
     st.markdown(f"""
     <div class="dash-header">

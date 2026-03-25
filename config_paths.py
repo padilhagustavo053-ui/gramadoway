@@ -33,7 +33,14 @@ def inject_streamlit_secrets_into_environ() -> None:
         sec = getattr(st, "secrets", None)
         if not sec:
             return
-        for key in ("GRAMADOWAY_DATA_DIR", "GRAMADOWAY_PLANILHA", "GRAMADOWAY_API_URL", "GRAMADOWAY_API_KEY"):
+        for key in (
+            "GRAMADOWAY_DATA_DIR",
+            "GRAMADOWAY_PLANILHA",
+            "GRAMADOWAY_API_URL",
+            "GRAMADOWAY_API_KEY",
+            "GRAMADOWAY_DATABASE_URL",
+            "SUPABASE_DB_URL",
+        ):
             if key in sec:
                 val = sec[key]
                 if val is not None and str(val).strip():

@@ -6,6 +6,7 @@ from typing import Optional
 
 from auth import sanitize_login
 from config_paths import data_root
+from db_store import db_enabled, doc_delete, doc_get, doc_set
 
 
 def _base_dir() -> Path:
@@ -34,6 +35,12 @@ def _caminho_rascunho(username: str) -> Path:
 
 
 def carregar_historico(username: str) -> list[dict]:
+    if db_enabled():
+        try:
+            data = doc_get(username, "historico")
+            return data if isinstance(data, list) else []
+        except Exception:
+            return []
     path = _caminho_historico(username)
     if not path.exists():
         return []
@@ -54,13 +61,22 @@ def salvar_pedido(username: str, cliente: dict, itens: list, total: float) -> di
         "total": total,
     }
     hist.insert(0, pedido)
-    _caminho_historico(username).write_text(
-        json.dumps(hist, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    if db_enabled():
+        doc_set(username, "historico", hist)
+    else:
+        _caminho_historico(username).write_text(
+            json.dumps(hist, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
     return pedido
 
 
 def carregar_clientes(username: str) -> list[dict]:
+    if db_enabled():
+        try:
+            data = doc_get(username, "clientes")
+            return data if isinstance(data, list) else []
+        except Exception:
+            return []
     path = _caminho_clientes(username)
     if not path.exists():
         return []
@@ -86,12 +102,21 @@ def salvar_cliente(username: str, cliente: dict) -> None:
         clientes[idx] = novo
     else:
         clientes.append(novo)
-    _caminho_clientes(username).write_text(
-        json.dumps(clientes, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    if db_enabled():
+        doc_set(username, "clientes", clientes)
+    else:
+        _caminho_clientes(username).write_text(
+            json.dumps(clientes, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
 
 def carregar_rascunho(username: str) -> Optional[dict]:
+    if db_enabled():
+        try:
+            data = doc_get(username, "rascunho")
+            return data if isinstance(data, dict) else None
+        except Exception:
+            return None
     path = _caminho_rascunho(username)
     if not path.exists():
         return None
@@ -109,12 +134,21 @@ def salvar_rascunho(username: str, cliente: dict, itens: list, total: float) -> 
         "total": total,
         "data": datetime.now().strftime("%d/%m/%Y %H:%M"),
     }
-    _caminho_rascunho(username).write_text(
-        json.dumps(rascunho, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    if db_enabled():
+        doc_set(username, "rascunho", rascunho)
+    else:
+        _caminho_rascunho(username).write_text(
+            json.dumps(rascunho, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
 
 def limpar_rascunho(username: str) -> None:
+    if db_enabled():
+        try:
+            doc_delete(username, "rascunho")
+        except Exception:
+            pass
+        return
     path = _caminho_rascunho(username)
     if path.exists():
         path.unlink()
