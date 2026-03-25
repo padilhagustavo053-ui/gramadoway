@@ -181,6 +181,15 @@ body:has(#gw-launch-anchor) .main {
     margin: 1.25rem 0 0 0;
     text-align: center;
 }
+/* Imagem da entrada (assets/gramadoway_entrada.png) */
+body:has(#gw-launch-anchor) [data-testid="stImage"] { display: flex !important; justify-content: center !important; }
+body:has(#gw-launch-anchor) [data-testid="stImage"] img,
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stImage"] img {
+    border-radius: 18px !important;
+    border: 1px solid rgba(201,162,39,0.5) !important;
+    box-shadow: 0 20px 48px rgba(0,0,0,0.55) !important;
+}
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stImage"] { margin-bottom: 0.75rem !important; }
 @keyframes gw-fade-up {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -836,26 +845,38 @@ def carregar_produtos_ui() -> tuple[list, str]:
     return produtos_padrao(), "catalogo_embutido"
 
 
+def _imagem_entrada_path() -> Path:
+    """PNG da tela de boas-vindas — substitua por versão recortada (só o cartão) se quiser."""
+    return Path(__file__).resolve().parent / "assets" / "gramadoway_entrada.png"
+
+
 def _render_launch_splash() -> None:
-    """Primeira visita: boas-vindas minimalistas + ações claras (sem Lottie / sem iframe branco)."""
+    """Primeira visita: imagem em assets/gramadoway_entrada.png ou cartão HTML de reserva."""
     st.markdown('<div id="gw-launch-anchor" aria-hidden="true"></div>', unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class="gw-launch-shell">
-          <div class="gw-launch-inner">
-            <div class="gw-launch-mark" aria-hidden="true">
-              <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="10" y="14" width="36" height="28" rx="6" stroke="#C9A227" stroke-width="2" fill="none"/>
-                <path d="M18 26 L28 33 L38 26" stroke="#E5D4A1" stroke-width="2" stroke-linecap="round" fill="none"/>
-              </svg>
+    img_entrada = _imagem_entrada_path()
+    if img_entrada.is_file():
+        st.image(str(img_entrada), use_container_width=True)
+    else:
+        st.markdown(
+            """
+            <div class="gw-launch-shell">
+              <div class="gw-launch-inner">
+                <div class="gw-launch-mark" aria-hidden="true">
+                  <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="14" width="36" height="28" rx="6" stroke="#C9A227" stroke-width="2" fill="none"/>
+                    <path d="M18 26 L28 33 L38 26" stroke="#E5D4A1" stroke-width="2" stroke-linecap="round" fill="none"/>
+                  </svg>
+                </div>
+                <p class="gw-launch-kicker">Chocolates artesanais</p>
+                <h1 class="gw-launch-title">Gramadoway</h1>
+                <p class="gw-launch-sub">Sistema de orçamento • <strong>Entrar</strong> ou <strong>criar conta</strong></p>
+              </div>
             </div>
-            <p class="gw-launch-kicker">Chocolates artesanais</p>
-            <h1 class="gw-launch-title">Gramadoway</h1>
-            <p class="gw-launch-sub">Sistema de orçamento • <strong>Entrar</strong> ou <strong>criar conta</strong></p>
-          </div>
-        </div>
-        <p class="gw-launch-hint">Toque num dos botões abaixo para continuar</p>
-        """,
+            """,
+            unsafe_allow_html=True,
+        )
+    st.markdown(
+        '<p class="gw-launch-hint">Toque num dos botões abaixo para continuar</p>',
         unsafe_allow_html=True,
     )
     st.markdown('<div style="height:1rem" aria-hidden="true"></div>', unsafe_allow_html=True)
@@ -888,16 +909,20 @@ def _render_login():
     if "gw_auth_choice" not in st.session_state:
         st.session_state["gw_auth_choice"] = "Entrar"
 
-    st.markdown(
-        """
-        <div class="gw-login-hero-strip">
-            <h1>GRAMADOWAY</h1>
-            <p class="sub">Chocolates artesanais</p>
-            <p class="tag">Sistema de orçamento • Digite as quantidades • Total calculado automaticamente</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    img_entrada = _imagem_entrada_path()
+    if img_entrada.is_file():
+        st.image(str(img_entrada), use_container_width=True)
+    else:
+        st.markdown(
+            """
+            <div class="gw-login-hero-strip">
+                <h1>GRAMADOWAY</h1>
+                <p class="sub">Chocolates artesanais</p>
+                <p class="tag">Sistema de orçamento • Digite as quantidades • Total calculado automaticamente</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
     st.markdown("### Acesso ao sistema")
     st.info(
         "Quem recebe o **link** pode usar o sistema por aqui. "
