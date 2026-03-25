@@ -11,6 +11,66 @@ from typing import Any
 from config_paths import data_root
 
 
+def _pontuacao_nome_planilha(nome_arquivo: str) -> int:
+    """
+    Prioriza nomes típicos da planilha Gramadoway (evita pegar outro .xlsx qualquer).
+    """
+    n = nome_arquivo.lower()
+    n = n.replace("í", "i").replace("ç", "c")
+    score = 0
+    if "gramadoway" in n:
+        score += 12
+    if "gramado" in n:
+        score += 10
+    if "planilha" in n:
+        score += 4
+    if "preco" in n or "preço" in nome_arquivo.lower():
+        score += 5
+    if "chocolate" in n or "bombom" in n or "barra" in n:
+        score += 2
+    return score
+
+
+def _melhor_xlsx_em_pasta(pasta: Path) -> Path | None:
+    """Entre vários .xlsx, escolhe o mais provável (nome + mais recente)."""
+    todos = list(pasta.glob("*.xlsx"))
+    if not todos:
+        return None
+    scored = [
+        (_pontuacao_nome_planilha(f.name), f.stat().st_mtime, f)
+        for f in todos
+        if _pontuacao_nome_planilha(f.name) > 0
+    ]
+    if scored:
+        scored.sort(key=lambda t: (-t[0], -t[1]))
+        return scored[0][2]
+    if len(todos) == 1:
+        return todos[0]
+    return None
+
+
+def _iter_desktop_dirs() -> list[Path]:
+    """Desktop local e Desktop do OneDrive (Windows comum)."""
+    h = Path.home()
+    out: list[Path] = []
+    for rel in ("Desktop", "OneDrive/Desktop", "OneDrive/Área de Trabalho"):
+        p = h / rel
+        if p.is_dir():
+            out.append(p)
+    # Evita duplicatas se os dois apontarem ao mesmo sítio
+    seen: set[Path] = set()
+    uniq: list[Path] = []
+    for p in out:
+        try:
+            r = p.resolve()
+        except OSError:
+            r = p
+        if r not in seen:
+            seen.add(r)
+            uniq.append(p)
+    return uniq
+
+
 def _caminho_planilha() -> Path:
     """Localiza planilha: GRAMADOWAY_PLANILHA, depois data/, depois Desktop."""
     env = os.environ.get("GRAMADOWAY_PLANILHA", "").strip()
@@ -28,24 +88,24 @@ def _caminho_planilha() -> Path:
         cand = root / name
         if cand.is_file():
             return cand
-    for f in sorted(root.glob("*.xlsx")):
-        if "gramadoway" in f.name.lower():
-            return f
-    for f in sorted(root.glob("*.xlsx")):
-        return f
 
-    desktop = Path.home() / "Desktop"
-    if desktop.is_dir():
-        for f in desktop.glob("*.xlsx"):
-            if "gramadoway" in f.name.lower():
-                return f
+    melhor_data = _melhor_xlsx_em_pasta(root)
+    if melhor_data is not None:
+        return melhor_data
+
+    desktop_hint = Path.home() / "Desktop"
+    for desktop in _iter_desktop_dirs():
+        melhor = _melhor_xlsx_em_pasta(desktop)
+        if melhor is not None:
+            return melhor
 
     raise FileNotFoundError(
         f"Planilha .xlsx não encontrada. Opções:\n"
         f"• Coloque o arquivo em: {root} (ex.: planilha.xlsx)\n"
         f"• Ou defina GRAMADOWAY_PLANILHA com o caminho completo\n"
         f"• Ou use o upload na tela do app (nuvem)\n"
-        f"• (PC local) Área de trabalho: {desktop}"
+        f"• (PC local) Área de trabalho com nome tipo *Gramado* / *planilha* / *preços*\n"
+        f"  Pastas verificadas: {', '.join(str(p) for p in _iter_desktop_dirs()) or desktop_hint}"
     )
 
 

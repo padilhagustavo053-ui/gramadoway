@@ -36,6 +36,7 @@ def inject_streamlit_secrets_into_environ() -> None:
         for key in (
             "GRAMADOWAY_DATA_DIR",
             "GRAMADOWAY_PLANILHA",
+            "GRAMADOWAY_PRIORIDADE_PRODUTOS",
             "GRAMADOWAY_API_URL",
             "GRAMADOWAY_API_KEY",
             "GRAMADOWAY_DATABASE_URL",

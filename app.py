@@ -3,6 +3,7 @@
 Sistema de Pedidos Gramadoway — Potente, robusto e grandioso
 Design inspirado em formulários profissionais de chocolates artesanais.
 """
+import os
 import streamlit as st
 import streamlit.components.v1 as components
 from pathlib import Path
@@ -683,20 +684,40 @@ def _carregar_produtos_arquivo(path_resolvido: str) -> list:
 
 
 def carregar_produtos_ui() -> tuple[list, str]:
-    """API → upload sessão → planilha em disco → catálogo embutido (sempre há produtos)."""
-    if obter_url_api():
+    """
+    Fonte de produtos (ordem padrão — lista completa no PC local):
+    1) Upload na sessão
+    2) Planilha em disco (data/, Desktop, GRAMADOWAY_PLANILHA já resolvido em extrair)
+    3) API (só se não houver ficheiro local útil — evita substituir a planilha grande por 50 ítens do servidor)
+    4) Catálogo embutido
+
+    Para forçar API primeiro (deploy antigo): defina GRAMADOWAY_PRIORIDADE_PRODUTOS=api
+    """
+    prioridade_api = os.environ.get("GRAMADOWAY_PRIORIDADE_PRODUTOS", "").strip().lower() == "api"
+
+    def _de_api():
+        if not obter_url_api():
+            return None, ""
         try:
             prod, src = carregar_produtos_api()
             if prod:
                 return prod, src
         except Exception as e:
-            st.warning(f"API indisponível — a usar catálogo embutido. ({e})")
+            st.warning(f"API indisponível — a usar planilha local ou catálogo embutido. ({e})")
+        return None, ""
+
     blob = st.session_state.get("_planilha_bytes")
     if blob:
         try:
             return extrair_todos_de_bytes(blob), "upload_sessao.xlsx"
         except Exception as e:
             st.error(f"Erro ao ler o Excel enviado: {e}")
+
+    if prioridade_api:
+        prod, src = _de_api()
+        if prod:
+            return prod, src
+
     try:
         path = _caminho_planilha()
         prod = _carregar_produtos_arquivo(str(path.resolve()))
@@ -706,6 +727,12 @@ def carregar_produtos_ui() -> tuple[list, str]:
         pass
     except Exception:
         pass
+
+    if not prioridade_api:
+        prod, src = _de_api()
+        if prod:
+            return prod, src
+
     from produtos_catalogo import produtos_padrao
 
     return produtos_padrao(), "catalogo_embutido"
