@@ -102,12 +102,11 @@ st.markdown("""
     --sombra-press: inset 0 2px 6px rgba(0,0,0,0.12);
 }
 
-/* ========== Launch / login — identidade chocolate + ouro (banner GRAMADOWAY) ========== */
+/* ========== Launch (entrada) — fundo slate como antes; letras com tom marrom / creme ========== */
 #gw-launch-anchor, #gw-login-anchor { position: absolute; width: 0; height: 0; pointer-events: none; }
 body:has(#gw-launch-anchor) [data-testid="stHeader"],
 body:has(#gw-launch-anchor) [data-testid="stSidebar"] { display: none !important; }
 
-/* Conteúdo centralizado — evita texto “cortado” à esquerda no Cloud */
 body:has(#gw-launch-anchor) .stMainBlockContainer {
     max-width: 28rem !important;
     margin-left: auto !important;
@@ -117,9 +116,8 @@ body:has(#gw-launch-anchor) .stMainBlockContainer {
     box-sizing: border-box !important;
 }
 
-/* Fundo chocolate escuro */
 body:has(#gw-launch-anchor) .stApp {
-    background: linear-gradient(180deg, #1a120b 0%, #2d1f14 42%, #1a120b 100%) !important;
+    background: linear-gradient(165deg, #0b1220 0%, #111827 38%, #0f172a 100%) !important;
 }
 body:has(#gw-launch-anchor) [data-testid="stAppViewContainer"],
 body:has(#gw-launch-anchor) [data-testid="stMain"],
@@ -129,47 +127,43 @@ body:has(#gw-launch-anchor) .main {
 
 .gw-launch-shell {
     text-align: center;
-    padding: 2rem 1.5rem 1.75rem;
+    padding: 1.75rem 1.5rem 1.5rem;
     margin: 0 auto 1.25rem;
     max-width: 100%;
-    border-radius: 0 0 18px 18px;
-    background: linear-gradient(180deg, rgba(45,34,24,0.97) 0%, rgba(26,18,11,0.99) 100%);
-    border: 1px solid rgba(201,162,39,0.28);
-    border-top: none;
-    border-bottom: 3px solid #C9A227;
-    box-shadow: 0 24px 56px rgba(0,0,0,0.55);
+    border-radius: 20px;
+    background: rgba(15,23,42,0.65);
+    border: 1px solid rgba(148,163,184,0.22);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.35);
     position: relative;
 }
 .gw-launch-inner { position: relative; z-index: 1; }
 .gw-launch-mark {
-    margin: 0 auto 1.1rem;
+    margin: 0 auto 1.25rem;
     display: flex;
     justify-content: center;
 }
 .gw-launch-kicker {
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #E5D4A1 !important;
-    margin-bottom: 0.65rem;
+    color: #c9a88a !important;
+    margin-bottom: 0.75rem;
 }
 .gw-launch-title {
-    font-family: 'Inter', sans-serif !important;
-    font-size: clamp(1.85rem, 6vw, 2.5rem);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #ffffff !important;
-    margin: 0 0 0.5rem 0;
+    font-family: 'Fraunces', Georgia, serif !important;
+    font-size: clamp(1.75rem, 6vw, 2.35rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: #faf6f1 !important;
+    margin: 0 0 0.65rem 0;
 }
 .gw-launch-sub {
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.98rem;
+    font-size: 1rem;
     font-weight: 500;
-    color: rgba(255,255,255,0.88) !important;
+    color: #e8ddd4 !important;
     margin: 0;
     line-height: 1.55;
 }
@@ -177,19 +171,17 @@ body:has(#gw-launch-anchor) .main {
     font-family: 'Inter', sans-serif !important;
     font-size: 0.78rem;
     font-weight: 500;
-    color: rgba(229,212,161,0.75) !important;
+    color: #a89888 !important;
     margin: 1.25rem 0 0 0;
     text-align: center;
 }
-/* Imagem da entrada (assets/gramadoway_entrada.png) */
+/* Imagem opcional na entrada */
 body:has(#gw-launch-anchor) [data-testid="stImage"] { display: flex !important; justify-content: center !important; }
-body:has(#gw-launch-anchor) [data-testid="stImage"] img,
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stImage"] img {
-    border-radius: 18px !important;
-    border: 1px solid rgba(201,162,39,0.5) !important;
-    box-shadow: 0 20px 48px rgba(0,0,0,0.55) !important;
+body:has(#gw-launch-anchor) [data-testid="stImage"] img {
+    border-radius: 16px !important;
+    border: 1px solid rgba(201,162,39,0.35) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4) !important;
 }
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stImage"] { margin-bottom: 0.75rem !important; }
 @keyframes gw-fade-up {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -207,19 +199,19 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button {
     font-size: 1rem !important;
     opacity: 1 !important;
     visibility: visible !important;
-    background: rgba(26,18,11,0.85) !important;
-    color: #fff !important;
-    border: 1px solid rgba(201,162,39,0.45) !important;
+    background: rgba(30,41,59,0.95) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148,163,184,0.5) !important;
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"],
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] * {
-    color: #1a120b !important;
-    -webkit-text-fill-color: #1a120b !important;
+    color: #1f140c !important;
+    -webkit-text-fill-color: #1f140c !important;
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #E5D4A1, #C9A227) !important;
+    background: linear-gradient(135deg, #d4a20c, #b8860b) !important;
     border: none !important;
-    box-shadow: 0 8px 28px rgba(201,162,39,0.35) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"],
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] * {
@@ -227,8 +219,8 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kin
     -webkit-text-fill-color: #ffffff !important;
 }
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] {
-    background: transparent !important;
-    border: 2px solid rgba(229,212,161,0.85) !important;
+    background: rgba(15,23,42,0.5) !important;
+    border: 2px solid rgba(248,250,252,0.65) !important;
     box-shadow: none !important;
 }
 
@@ -258,94 +250,65 @@ section[data-testid="stMain"] span:not([class*="material"]):not([data-testid="st
     color: var(--texto-primary) !important;
 }
 
-/* Splash: ganhar ao CSS acima — letras claras no fundo escuro */
+/* Splash: texto legível — tons marrom / creme (não cinza frio) */
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown,
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown p,
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown h1,
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown span,
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown div {
-    color: #f8fafc !important;
+    color: #faf6f1 !important;
 }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-kicker { color: #94a3b8 !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-title { color: #f8fafc !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-sub { color: #cbd5e1 !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-hint { color: #64748b !important; }
-body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown strong { color: #ffffff !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-kicker { color: #c9a88a !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-title { color: #faf6f1 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-sub { color: #e8ddd4 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-hint { color: #a89888 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown strong { color: #fff8f0 !important; }
 
-/* Página de login (após splash): mesmo chocolate + cartão escuro */
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stHeader"],
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stSidebar"] { display: none !important; }
+/* Login: fundo claro como antes + faixa com tipografia marrom */
 body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stApp {
-    background: linear-gradient(180deg, #1a120b 0%, #2d1f14 45%, #1a120b 100%) !important;
+    background: linear-gradient(180deg, #faf7f2 0%, #f5f0e8 100%) !important;
 }
 body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stMainBlockContainer {
-    max-width: 26rem !important;
+    max-width: 32rem !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    padding: 1.25rem 1rem 2rem !important;
+    padding: 1rem 1rem 2rem !important;
 }
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .gw-login-hero-strip {
+.gw-login-hero-light {
     text-align: center;
-    padding: 1.75rem 1.25rem 1.5rem;
-    margin: 0 -0.5rem 1.25rem -0.5rem;
-    border-radius: 0 0 16px 16px;
-    background: linear-gradient(180deg, #2d2218 0%, #1a1410 100%);
-    border-bottom: 3px solid #C9A227;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+    padding: 1.35rem 1.25rem 1.5rem;
+    margin: 0 0 1.25rem 0;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fffefb 0%, var(--creme) 100%);
+    border: 1px solid var(--borda);
+    box-shadow: var(--sombra-md);
+    border-bottom: 2px solid var(--ouro);
 }
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .gw-login-hero-strip h1 {
+.gw-login-hero-light h1 {
     font-family: 'Inter', sans-serif !important;
-    font-size: 1.65rem !important;
+    font-size: 1.5rem !important;
     font-weight: 800 !important;
-    letter-spacing: 0.12em !important;
-    color: #fff !important;
+    letter-spacing: 0.1em !important;
+    color: #3d2914 !important;
     margin: 0 !important;
 }
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .gw-login-hero-strip .sub {
-    font-size: 0.72rem !important;
-    letter-spacing: 0.22em !important;
+.gw-login-hero-light .sub {
+    font-size: 0.7rem !important;
+    letter-spacing: 0.24em !important;
     text-transform: uppercase !important;
-    color: #E5D4A1 !important;
-    margin: 0.5rem 0 0 0 !important;
+    color: #6b5344 !important;
+    margin: 0.45rem 0 0 0 !important;
     font-weight: 600 !important;
 }
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .gw-login-hero-strip .tag {
-    font-size: 0.78rem !important;
-    color: rgba(255,255,255,0.88) !important;
-    margin: 0.65rem 0 0 0 !important;
+.gw-login-hero-light .tag {
+    font-size: 0.8rem !important;
+    color: #5c4a3d !important;
+    margin: 0.55rem 0 0 0 !important;
     line-height: 1.45 !important;
 }
 body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) section[data-testid="stMain"] h3,
 body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) section[data-testid="stMain"] .stMarkdown h3 {
-    color: #fff !important;
-}
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) label,
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stWidgetLabel"] p {
-    color: #F5F0E8 !important;
-}
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stAlert"] {
-    background: rgba(45,34,24,0.9) !important;
-    border-color: rgba(201,162,39,0.4) !important;
-}
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-testid="stAlert"] p {
-    color: #fff !important;
-}
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stTextInput input {
-    background: rgba(255,255,255,0.96) !important;
-    color: #1a120b !important;
-    border-radius: 10px !important;
-}
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-baseweb="radio"] label,
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) [data-baseweb="radio"] p {
-    color: #F5F0E8 !important;
-}
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) section[data-testid="stMain"] .stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #E5D4A1, #C9A227) !important;
-    color: #1a120b !important;
-}
-body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) section[data-testid="stMain"] .stButton > button[kind="primary"] * {
-    color: #1a120b !important;
-    -webkit-text-fill-color: #1a120b !important;
+    color: #3d2914 !important;
 }
 
 /* Logo: título branco — override qualquer herança */
@@ -864,7 +827,7 @@ def _render_launch_splash() -> None:
                 <div class="gw-launch-mark" aria-hidden="true">
                   <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="10" y="14" width="36" height="28" rx="6" stroke="#C9A227" stroke-width="2" fill="none"/>
-                    <path d="M18 26 L28 33 L38 26" stroke="#E5D4A1" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path d="M18 26 L28 33 L38 26" stroke="#c9a88a" stroke-width="2" stroke-linecap="round" fill="none"/>
                   </svg>
                 </div>
                 <p class="gw-launch-kicker">Chocolates artesanais</p>
@@ -909,20 +872,16 @@ def _render_login():
     if "gw_auth_choice" not in st.session_state:
         st.session_state["gw_auth_choice"] = "Entrar"
 
-    img_entrada = _imagem_entrada_path()
-    if img_entrada.is_file():
-        st.image(str(img_entrada), use_container_width=True)
-    else:
-        st.markdown(
-            """
-            <div class="gw-login-hero-strip">
-                <h1>GRAMADOWAY</h1>
-                <p class="sub">Chocolates artesanais</p>
-                <p class="tag">Sistema de orçamento • Digite as quantidades • Total calculado automaticamente</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    st.markdown(
+        """
+        <div class="gw-login-hero-light">
+            <h1>GRAMADOWAY</h1>
+            <p class="sub">Chocolates artesanais</p>
+            <p class="tag">Sistema de orçamento • Digite as quantidades • Total calculado automaticamente</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown("### Acesso ao sistema")
     st.info(
         "Quem recebe o **link** pode usar o sistema por aqui. "
