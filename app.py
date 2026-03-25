@@ -117,39 +117,53 @@ body:has(#gw-launch-anchor) [data-testid="stHeader"] { display: none !important;
 body:has(#gw-launch-anchor) [data-testid="stSidebar"] { display: none !important; }
 body:has(#gw-launch-anchor) .stMainBlockContainer { padding-top: 0.5rem !important; max-width: 100% !important; }
 
+/* Splash: fundo em toda a vista — moderno, contraste forte (não “chocolate chapado”) */
+body:has(#gw-launch-anchor) .stApp {
+    background:
+        radial-gradient(ellipse 90% 55% at 50% -8%, rgba(201,162,39,0.22) 0%, transparent 52%),
+        radial-gradient(ellipse 55% 40% at 95% 85%, rgba(99,102,241,0.14) 0%, transparent 50%),
+        radial-gradient(ellipse 45% 35% at 5% 60%, rgba(16,185,129,0.08) 0%, transparent 45%),
+        linear-gradient(168deg, #070605 0%, #12100e 42%, #0a0908 100%) !important;
+}
+body:has(#gw-launch-anchor) [data-testid="stAppViewContainer"],
+body:has(#gw-launch-anchor) [data-testid="stMain"],
+body:has(#gw-launch-anchor) .main {
+    background: transparent !important;
+}
+
 .gw-launch-shell {
-    min-height: 88vh;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 2rem 1.5rem 3rem;
-    margin: -0.5rem -1rem 0 -1rem;
-    border-radius: 0 0 24px 24px;
-    background: linear-gradient(125deg, #1a0f0a 0%, #2d1f14 35%, #3d2914 55%, #1f1510 100%);
-    background-size: 200% 200%;
-    animation: gw-gradient-flow 10s ease infinite;
-    box-shadow: 0 24px 60px rgba(26,15,10,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    padding: 2rem 1.75rem 1.5rem;
+    margin: 0.5rem auto 0.75rem;
+    max-width: 560px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow:
+        0 32px 64px rgba(0,0,0,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.1);
     position: relative;
     overflow: hidden;
 }
 .gw-launch-shell::before {
     content: "";
     position: absolute;
-    inset: -40%;
-    background: radial-gradient(ellipse at 30% 20%, rgba(201,162,39,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(229,212,161,0.08) 0%, transparent 45%);
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 0%, rgba(201,162,39,0.12) 0%, transparent 42%),
+        radial-gradient(ellipse at 80% 100%, rgba(255,255,255,0.05) 0%, transparent 40%);
     pointer-events: none;
-    animation: gw-glow-pulse 5s ease-in-out infinite;
-}
-@keyframes gw-gradient-flow {
-    0%, 100% { background-position: 0% 40%; }
-    50% { background-position: 100% 60%; }
 }
 @keyframes gw-glow-pulse {
-    0%, 100% { opacity: 0.7; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.02); }
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
 }
 .gw-launch-inner { position: relative; z-index: 1; max-width: 520px; }
 .gw-launch-kicker {
@@ -158,8 +172,8 @@ body:has(#gw-launch-anchor) .stMainBlockContainer { padding-top: 0.5rem !importa
     font-weight: 700;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: rgba(255,236,200,0.95) !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    color: #fef3c7 !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     margin-bottom: 1rem;
     animation: gw-fade-up 0.9s ease-out both;
 }
@@ -168,19 +182,19 @@ body:has(#gw-launch-anchor) .stMainBlockContainer { padding-top: 0.5rem !importa
     font-size: clamp(2rem, 5vw, 2.75rem);
     font-weight: 700;
     line-height: 1.15;
-    color: #fff !important;
+    color: #ffffff !important;
     margin: 0 0 0.5rem 0;
-    text-shadow: 0 2px 24px rgba(0,0,0,0.35);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.55);
     animation: gw-fade-up 0.9s ease-out 0.12s both;
 }
 .gw-launch-sub {
     font-family: 'Inter', sans-serif !important;
     font-size: 1.0625rem;
     font-weight: 600;
-    color: rgba(255,255,255,0.96) !important;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
-    margin: 0 0 2rem 0;
-    line-height: 1.5;
+    color: #f1f5f9 !important;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.45);
+    margin: 0 0 1.25rem 0;
+    line-height: 1.55;
     animation: gw-fade-up 0.9s ease-out 0.22s both;
 }
 .gw-launch-loader {
@@ -234,7 +248,7 @@ body:has(#gw-launch-anchor) .stMainBlockContainer { padding-top: 0.5rem !importa
     font-family: 'Inter', sans-serif !important;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: rgba(255,245,220,0.72) !important;
+    color: rgba(241,245,249,0.78) !important;
     margin-top: 1.25rem;
     animation: gw-fade-up 0.9s ease-out 0.5s both;
 }
@@ -277,6 +291,43 @@ section[data-testid="stMain"] span:not([class*="material"]):not([data-testid="st
     font-weight: 400 !important;
     color: var(--texto-primary) !important;
 }
+
+/* Splash: ganhar ao CSS acima — letras claras no fundo escuro */
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown,
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown p,
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown h1,
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown span,
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown div {
+    color: #f8fafc !important;
+}
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-kicker { color: #fef3c7 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-title { color: #ffffff !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-sub { color: #f1f5f9 !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .gw-launch-hint { color: rgba(241,245,249,0.8) !important; }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stMarkdown strong { color: #ffffff !important; }
+
+/* Página de login (após splash): leve contraste no fundo */
+body:has(#gw-login-anchor):not(:has(#gw-launch-anchor)) .stApp {
+    background: linear-gradient(180deg, #faf7f2 0%, #f5f0e8 100%) !important;
+}
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button {
+    border-radius: 14px !important;
+    font-weight: 700 !important;
+    min-height: 3rem !important;
+}
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #f0d078, #c9a227) !important;
+    color: #1a1208 !important;
+    border: none !important;
+    box-shadow: 0 6px 28px rgba(201,162,39,0.4) !important;
+}
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] {
+    background: rgba(255,255,255,0.08) !important;
+    color: #ffffff !important;
+    border: 2px solid rgba(255,255,255,0.45) !important;
+    box-shadow: none !important;
+}
+
 /* Logo: título branco — override qualquer herança */
 .logo-container h1, div.logo-container h1, .logo-container > h1 { color: #ffffff !important; }
 section[data-testid="stMain"] .stMarkdown strong { font-weight: 600 !important; }
@@ -734,7 +785,7 @@ def _render_launch_splash() -> None:
           <div class="gw-launch-inner">
             <p class="gw-launch-kicker">Chocolates artesanais</p>
             <h1 class="gw-launch-title">Seja bem-vindo</h1>
-            <p class="gw-launch-sub">A carregar o sistema de pedidos e orçamentos.<br/>Tudo pronto num instante.</p>
+            <p class="gw-launch-sub">Pedidos e orçamentos num só lugar.<br/><strong style="color:#fff;">Entre</strong> com a sua conta ou <strong style="color:#fff;">crie uma nova</strong> — escolha abaixo.</p>
           </div>
         </div>
         """,
@@ -775,34 +826,55 @@ def _render_launch_splash() -> None:
         """
         <div class="gw-launch-footer">
             <div class="gw-launch-bar" aria-hidden="true"><span></span></div>
-            <p class="gw-launch-hint">Gramadoway • Lottie + som ao entrar</p>
+            <p class="gw-launch-hint">Gramadoway • Acesso seguro à sua área de pedidos</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    _, col_btn, _ = st.columns([1, 1.15, 1])
-    with col_btn:
+    _, c_entrar, c_criar, _ = st.columns([0.2, 1, 1, 0.2], gap="medium")
+    with c_entrar:
         if st.button(
-            "Entrar no sistema",
+            "Entrar",
             type="primary",
             use_container_width=True,
-            key="gw_btn_entrar_launch",
+            key="gw_splash_entrar",
         ):
             st.session_state["gw_splash_done"] = True
+            st.session_state["gw_auth_choice"] = "Entrar"
+            st.session_state["_gw_play_chime"] = True
+            st.rerun()
+    with c_criar:
+        if st.button(
+            "Criar minha conta",
+            type="secondary",
+            use_container_width=True,
+            key="gw_splash_criar",
+        ):
+            st.session_state["gw_splash_done"] = True
+            st.session_state["gw_auth_choice"] = "Criar minha conta"
             st.session_state["_gw_play_chime"] = True
             st.rerun()
 
 
 def _render_login():
     """Link público: cada pessoa cria o próprio usuário ou entra se já tiver cadastro."""
+    st.markdown('<div id="gw-login-anchor" aria-hidden="true"></div>', unsafe_allow_html=True)
+    if "gw_auth_choice" not in st.session_state:
+        st.session_state["gw_auth_choice"] = "Entrar"
+
     st.markdown("### Gramadoway — Acesso")
     st.info(
         "Quem recebe o **link** pode usar o sistema por aqui. "
-        "Não há senha para “abrir o site”: em **Criar minha conta** você escolhe login e senha **só seus**. "
+        "Em **Criar minha conta** você escolhe login e senha **só seus**. "
         "Se já se cadastrou antes, use **Entrar**."
     )
-    tab_entrar, tab_criar = st.tabs(["Entrar", "Criar minha conta"])
-    with tab_entrar:
+    st.radio(
+        "Como deseja continuar?",
+        ["Entrar", "Criar minha conta"],
+        horizontal=True,
+        key="gw_auth_choice",
+    )
+    if st.session_state["gw_auth_choice"] == "Entrar":
         with st.form("form_login_publico"):
             lg = st.text_input("Usuário", placeholder="seu login", key="pub_login_user")
             pw = st.text_input("Senha", type="password", key="pub_login_pw")
@@ -814,7 +886,7 @@ def _render_login():
                     st.rerun()
                 else:
                     st.error("Usuário ou senha incorretos.")
-    with tab_criar:
+    else:
         with st.form("form_cadastro_publico"):
             nu = st.text_input(
                 "Escolha seu login",
