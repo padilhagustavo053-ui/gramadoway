@@ -188,16 +188,25 @@ body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button {
     color: #f8fafc !important;
     border: 1px solid rgba(148,163,184,0.5) !important;
 }
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"],
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] * {
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
+}
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="primary"] {
     background: linear-gradient(135deg, #d4a20c, #b8860b) !important;
-    color: #0f172a !important;
     border: none !important;
     box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
 }
+/* Secundário: Streamlit pinta o rótulo interno com theme textColor — forçar branco no botão e em tudo lá dentro */
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"],
+body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
 body:has(#gw-launch-anchor) section[data-testid="stMain"] .stButton > button[kind="secondary"] {
-    background: transparent !important;
-    color: #e2e8f0 !important;
-    border: 2px solid rgba(226,232,240,0.55) !important;
+    background: rgba(15,23,42,0.5) !important;
+    border: 2px solid rgba(248,250,252,0.65) !important;
     box-shadow: none !important;
 }
 
