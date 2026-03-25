@@ -71,6 +71,42 @@ def _iter_desktop_dirs() -> list[Path]:
     return uniq
 
 
+def _iter_downloads_dirs() -> list[Path]:
+    """Downloads (ficheiro às vezes fica aqui em vez do Desktop)."""
+    h = Path.home()
+    out: list[Path] = []
+    for rel in ("Downloads", "OneDrive/Downloads", "Transferências"):
+        p = h / rel
+        if p.is_dir():
+            out.append(p)
+    seen: set[Path] = set()
+    uniq: list[Path] = []
+    for p in out:
+        try:
+            r = p.resolve()
+        except OSError:
+            r = p
+        if r not in seen:
+            seen.add(r)
+            uniq.append(p)
+    return uniq
+
+
+def _pastas_onde_procurar_planilha() -> list[Path]:
+    """Ordem: data/ já é tratada à parte; isto é só pastas do utilizador."""
+    seen: set[Path] = set()
+    ordem: list[Path] = []
+    for p in _iter_desktop_dirs() + _iter_downloads_dirs():
+        try:
+            r = p.resolve()
+        except OSError:
+            r = p
+        if r not in seen:
+            seen.add(r)
+            ordem.append(p)
+    return ordem
+
+
 def _caminho_planilha() -> Path:
     """Localiza planilha: GRAMADOWAY_PLANILHA, depois data/, depois Desktop."""
     env = os.environ.get("GRAMADOWAY_PLANILHA", "").strip()
@@ -94,8 +130,8 @@ def _caminho_planilha() -> Path:
         return melhor_data
 
     desktop_hint = Path.home() / "Desktop"
-    for desktop in _iter_desktop_dirs():
-        melhor = _melhor_xlsx_em_pasta(desktop)
+    for pasta in _pastas_onde_procurar_planilha():
+        melhor = _melhor_xlsx_em_pasta(pasta)
         if melhor is not None:
             return melhor
 
@@ -104,8 +140,9 @@ def _caminho_planilha() -> Path:
         f"• Coloque o arquivo em: {root} (ex.: planilha.xlsx)\n"
         f"• Ou defina GRAMADOWAY_PLANILHA com o caminho completo\n"
         f"• Ou use o upload na tela do app (nuvem)\n"
-        f"• (PC local) Área de trabalho com nome tipo *Gramado* / *planilha* / *preços*\n"
-        f"  Pastas verificadas: {', '.join(str(p) for p in _iter_desktop_dirs()) or desktop_hint}"
+        f"• (PC) Área de trabalho ou Downloads, nome tipo *Gramado* / *planilha* / *preços*\n"
+        f"• Execute: python scripts/sincronizar_planilha_desktop.py (copia para data/planilha.xlsx)\n"
+        f"  Pastas verificadas: {', '.join(str(p) for p in _pastas_onde_procurar_planilha()) or desktop_hint}"
     )
 
 

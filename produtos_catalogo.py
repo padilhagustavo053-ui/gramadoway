@@ -8,6 +8,19 @@ from __future__ import annotations
 
 
 def produtos_padrao() -> list[dict]:
+    """Se existir data/planilha.xlsx, usa a planilha real; senão lista demo pequena."""
+    try:
+        from config_paths import data_root
+        from extrair import extrair_todos
+
+        p = data_root() / "planilha.xlsx"
+        if p.is_file():
+            todos = extrair_todos(p)
+            if todos:
+                return todos
+    except Exception:
+        pass
+
     out: list[dict] = []
 
     def p(cat, cod, nome, un, preco):
