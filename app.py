@@ -27,8 +27,16 @@ from historico import (
     carregar_clientes, salvar_cliente,
     carregar_rascunho, salvar_rascunho, limpar_rascunho,
 )
-from utils import mascara_cnpj, mascara_telefone, mascara_cep, formatar_moeda, aplicar_totais_pedido
-from busca_inteligente import buscar_produtos, parsear_atalho
+from utils import (
+    mascara_cnpj,
+    mascara_telefone,
+    mascara_cep,
+    formatar_moeda,
+    aplicar_totais_pedido,
+    chaves_produtos_df,
+    sincronizar_df_pedido_com_catalogo,
+)
+from busca_inteligente import buscar_produtos
 import auth
 
 # Som suave (Web Audio) — iframe 0px após clicar "Entrar no sistema"
@@ -1037,7 +1045,11 @@ def main():
                 if cli.get(k):
                     st.session_state[sk] = str(cli[k])
     else:
-        aplicar_totais_pedido(st.session_state.df_pedido)
+        velho = st.session_state.df_pedido
+        if chaves_produtos_df(df) != chaves_produtos_df(velho) or len(df) != len(velho):
+            st.session_state.df_pedido = sincronizar_df_pedido_com_catalogo(df, velho)
+        else:
+            aplicar_totais_pedido(st.session_state.df_pedido)
 
     # Garante coluna preco_por
     if "preco_por" not in st.session_state.df_pedido.columns:
@@ -1075,51 +1087,36 @@ def main():
     abas_unicas = ["Personalizados", "Barras", "Bombons liquidos", "Bombons 12gr", "Trufas", "Degustação", "Planilha9"]
     abas_unicas = [a for a in abas_unicas if (df_ped["aba"] == a).any()]
 
-    # Busca inteligente — atalho rápido: "produto 5" adiciona 5
-    col_atalho, col_busca = st.columns(2)
-    with col_atalho:
-        atalho = st.text_input(
-            "Adicionar rápido",
-            placeholder="Ex: barras 2,5 ou avião 10 — produto e quantidade",
-            key="atalho_rapido",
-            help="Digite nome ou código do produto, espaço, e a quantidade.",
-        )
-    with col_busca:
-        busca = st.text_input("Buscar produto", placeholder="Digite nome ou código do produto...", key="busca_global")
-    if atalho:
-        parsed = parsear_atalho(atalho)
-        if parsed:
-            termo, qtd = parsed
-            df_busca = buscar_produtos(df_ped, termo, limite=5)
-            if len(df_busca) > 0:
-                idx = df_busca.index[0]
-                if idx in st.session_state.df_pedido.index:
-                    antigo = float(st.session_state.df_pedido.loc[idx, "Qtde"])
-                    novo = antigo + qtd
-                    st.session_state.df_pedido.loc[idx, "Qtde"] = novo
-                    aplicar_totais_pedido(st.session_state.df_pedido)
-                    st.success(f"Adicionado: {df_busca.iloc[0]['produto'][:40]} +{qtd}")
-                    if "atalho_rapido" in st.session_state:
-                        del st.session_state["atalho_rapido"]
-                    st.rerun()
-
-    # Abas visuais — Busca rápida, alteração de preço, categorias, Orçamento
+    # Abas: Busca rápida | categorias | Orçamento | Alteração de preço (ao lado do Orçamento)
     tab_labels = (
-        ["Busca rápida", "Alteração de preço"]
+        ["Busca rápida"]
         + [f"{a} ({len(df_ped[df_ped['aba']==a])})" for a in abas_unicas]
-        + ["Orçamento"]
+        + ["Orçamento", "Alteração de preço"]
     )
     tabs = st.tabs(tab_labels)
     edited_frames = []
     edited_preco_df = None
     num_abas_produtos = len(abas_unicas)
 
-    # Tab 0: Busca rápida — itens selecionados (Qtde>0) sobem para o topo
+    # Tab 0: Busca rápida — busca só aqui (removida barra superior global)
     with tabs[0]:
-        df_busca_full = buscar_produtos(df_ped, busca or " ", limite=80)
+        st.caption(
+            f"**Busca rápida** em {len(df_ped)} produtos. Itens com quantidade aparecem primeiro. "
+            "Confirme a célula (Enter ou clique fora) para atualizar o total."
+        )
+        c_lb, c_in = st.columns([0.07, 0.93])
+        with c_lb:
+            st.markdown('<p style="font-size:1.5rem;margin:0;line-height:1.2;" title="Buscar">🔍</p>', unsafe_allow_html=True)
+        with c_in:
+            busca = st.text_input(
+                "Buscar produto",
+                placeholder="Digite nome ou código do produto…",
+                key="busca_rapida_tab",
+                label_visibility="collapsed",
+            )
+        df_busca_full = buscar_produtos(df_ped, busca or " ", limite=120)
         if len(df_busca_full) > 0:
             df_busca_full = df_busca_full.sort_values(by="Qtde", ascending=False)
-        st.caption(f"Busca inteligente em {len(df_ped)} produtos. Itens com quantidade primeiro. Total atualiza ao confirmar a edição na célula.")
         if len(df_busca_full) > 0:
             df_edit_busca = df_busca_full[["produto", "un", "preco_por", "preco", "Qtde", "Total"]].copy()
             edited_busca = st.data_editor(
@@ -1144,57 +1141,9 @@ def main():
         else:
             st.markdown("""
             <div class="action-placeholder" style="margin:0.5rem 0;">
-                Digite na busca acima para filtrar. Ex: barras, avião, 480.
+                Use o campo de busca acima. Ex.: barras, avião, 480, trufa.
             </div>
             """, unsafe_allow_html=True)
-
-    # Tab 1: Alteração de preço — busca dedicada + só a coluna Preço editável
-    with tabs[1]:
-        st.caption(
-            "🔍 **Alteração de preço** — encontre o produto e altere **Preço**; "
-            "totais do pedido recalculam ao confirmar a célula."
-        )
-        col_lupa, col_campo = st.columns([0.08, 0.92])
-        with col_lupa:
-            st.markdown('<p style="font-size:1.6rem;margin:0;line-height:1.2;">🔍</p>', unsafe_allow_html=True)
-        with col_campo:
-            busca_preco = st.text_input(
-                "Buscar produto para alterar preço",
-                placeholder="Nome, tipo de chocolate, código…",
-                key="busca_alteracao_preco",
-                label_visibility="collapsed",
-            )
-        termo_preco = (busca_preco or "").strip()
-        if len(termo_preco) < 2:
-            st.info("Digite **pelo menos 2 caracteres** para buscar e alterar preços.")
-            df_pre = df_ped.head(0)
-        else:
-            df_pre = buscar_produtos(df_ped, termo_preco, limite=100)
-        if len(df_pre) == 0 and len(termo_preco) >= 2:
-            st.warning("Nenhum produto encontrado. Tente outro termo.")
-        if len(df_pre) > 0:
-            df_pre_show = df_pre[["produto", "aba", "un", "preco_por", "preco", "Qtde", "Total"]].copy()
-            edited_preco_df = st.data_editor(
-                df_pre_show,
-                column_config={
-                    "produto": st.column_config.TextColumn("Produto", disabled=True, width="large"),
-                    "aba": st.column_config.TextColumn("Categoria", disabled=True),
-                    "un": st.column_config.TextColumn("Un.", disabled=True),
-                    "preco_por": st.column_config.TextColumn("Preço por", disabled=True),
-                    "preco": st.column_config.NumberColumn(
-                        "Preço",
-                        format="R$ %.2f",
-                        min_value=0.0,
-                        step=0.01,
-                        help="Preço unitário (R$/kg, R$/un, etc., conforme a unidade).",
-                    ),
-                    "Qtde": st.column_config.NumberColumn("Qtde", format="%.2f", disabled=True),
-                    "Total": st.column_config.NumberColumn("Total", format="R$ %.2f", disabled=True),
-                },
-                use_container_width=True,
-                height=min(480, 140 + len(df_pre_show) * 36),
-                key="tab_alteracao_preco",
-            )
 
     col_config = {
         "produto": st.column_config.TextColumn("Produto", disabled=True),
@@ -1206,10 +1155,8 @@ def main():
     }
 
     for i, aba in enumerate(abas_unicas):
-        with tabs[i + 2]:
+        with tabs[i + 1]:
             df_tab = df_ped[df_ped["aba"] == aba].copy()
-            if busca:
-                df_tab = df_tab[df_tab["produto"].str.contains(busca, case=False, na=False)]
             df_tab = df_tab.sort_values(by="Qtde", ascending=False)
             st.caption("Un. = KG | UN | SACO — Total = Qtde × Preço (atualiza ao sair da célula ou Enter)")
             if len(df_tab) > 0:
@@ -1230,7 +1177,7 @@ def main():
                 """, unsafe_allow_html=True)
 
     # Aba Orçamento — resumo filtrado (só itens com qtde), útil para imprimir/enviar
-    with tabs[num_abas_produtos + 2]:
+    with tabs[num_abas_produtos + 1]:
         itens_orc = df_ped[df_ped["Qtde"] > 0]
         if len(itens_orc) > 0:
             df_orc = itens_orc[["Qtde", "produto", "un", "preco", "Total"]].copy()
@@ -1246,6 +1193,60 @@ def main():
                 Adicione quantidades nos produtos para gerar o orçamento.
             </div>
             """, unsafe_allow_html=True)
+
+    # Última aba: alteração de preço (ao lado do Orçamento na barra de tabs)
+    with tabs[num_abas_produtos + 2]:
+        with st.expander("📖 Como usar a alteração de preço", expanded=True):
+            st.markdown(
+                """
+1. **Busque** pelo nome do bombom, barra, código ou parte do texto (mínimo 2 caracteres).  
+2. A tabela mostra em qual **categoria** (aba) cada item está.  
+3. Edite só a coluna **Preço**; **Qtde** e **Total** atualizam no pedido quando confirmar a célula.  
+4. Preços **R$ 0,00** na lista vêm de linhas da planilha sem valor — preencha aqui ou no Excel e use **Recarregar lista** no expander *Substituir planilha*.
+                """
+            )
+        st.caption("🔍 Alteração de preço — busca em todas as categorias.")
+        col_lp, col_cp = st.columns([0.08, 0.92])
+        with col_lp:
+            st.markdown('<p style="font-size:1.6rem;margin:0;line-height:1.2;">🔍</p>', unsafe_allow_html=True)
+        with col_cp:
+            busca_preco = st.text_input(
+                "Buscar produto para alterar preço",
+                placeholder="Nome, tipo, código…",
+                key="busca_alteracao_preco",
+                label_visibility="collapsed",
+            )
+        termo_preco = (busca_preco or "").strip()
+        if len(termo_preco) < 2:
+            st.info("Digite **pelo menos 2 caracteres** para buscar e alterar preços.")
+            df_pre = df_ped.head(0)
+        else:
+            df_pre = buscar_produtos(df_ped, termo_preco, limite=120)
+        if len(df_pre) == 0 and len(termo_preco) >= 2:
+            st.warning("Nenhum produto encontrado. Tente outro termo.")
+        if len(df_pre) > 0:
+            df_pre_show = df_pre[["produto", "aba", "un", "preco_por", "preco", "Qtde", "Total"]].copy()
+            edited_preco_df = st.data_editor(
+                df_pre_show,
+                column_config={
+                    "produto": st.column_config.TextColumn("Produto", disabled=True, width="large"),
+                    "aba": st.column_config.TextColumn("Categoria", disabled=True),
+                    "un": st.column_config.TextColumn("Un.", disabled=True),
+                    "preco_por": st.column_config.TextColumn("Preço por", disabled=True),
+                    "preco": st.column_config.NumberColumn(
+                        "Preço",
+                        format="R$ %.2f",
+                        min_value=0.0,
+                        step=0.01,
+                        help="Preço unitário (R$/kg, R$/un, etc.).",
+                    ),
+                    "Qtde": st.column_config.NumberColumn("Qtde", format="%.2f", disabled=True),
+                    "Total": st.column_config.NumberColumn("Total", format="R$ %.2f", disabled=True),
+                },
+                use_container_width=True,
+                height=min(480, 140 + len(df_pre_show) * 36),
+                key="tab_alteracao_preco",
+            )
 
     for aba, edited in edited_frames:
         for idx in edited.index:

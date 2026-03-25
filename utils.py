@@ -80,3 +80,51 @@ def aplicar_totais_pedido(df: pd.DataFrame) -> None:
     q = pd.to_numeric(df["Qtde"], errors="coerce").fillna(0).clip(lower=0)
     p = pd.to_numeric(df["preco"], errors="coerce").fillna(0)
     df["Total"] = (q * p).round(2)
+
+
+def chaves_produtos_df(df: pd.DataFrame) -> set[tuple[str, str, str]]:
+    """Identifica linhas do catálogo (categoria, produto, código)."""
+    if df is None or len(df) == 0:
+        return set()
+    n = len(df)
+    if "categoria" in df.columns:
+        c = df["categoria"].astype(str).fillna("")
+    else:
+        c = pd.Series([""] * n)
+    if "produto" in df.columns:
+        pr = df["produto"].astype(str).fillna("")
+    else:
+        pr = pd.Series([""] * n)
+    if "codigo" in df.columns:
+        co = df["codigo"].astype(str).fillna("")
+    else:
+        co = pd.Series([""] * n)
+    return set(zip(c.tolist(), pr.tolist(), co.tolist()))
+
+
+def sincronizar_df_pedido_com_catalogo(df_catalogo: pd.DataFrame, df_atual: pd.DataFrame) -> pd.DataFrame:
+    """
+    Substitui o pedido pela lista completa do catálogo e recupera quantidades
+    já digitadas quando produto+categoria+código coincidem (ex.: planilha nova com mais linhas).
+    """
+    df_new = df_catalogo.copy()
+    if "codigo" not in df_new.columns:
+        df_new["codigo"] = ""
+    df_new["un"] = df_new["un"].fillna("UN").replace("", "UN")
+    df_new["Qtde"] = 0.0
+    df_new["Total"] = 0.0
+    for _, row in df_atual.iterrows():
+        mask = (
+            (df_new["produto"] == row["produto"])
+            & (df_new["categoria"] == row["categoria"])
+            & (df_new["codigo"].astype(str) == str(row.get("codigo", "") or ""))
+        )
+        if mask.any():
+            ix = df_new.index[mask][0]
+            try:
+                q = float(row.get("Qtde", 0) or 0)
+            except (TypeError, ValueError):
+                q = 0.0
+            df_new.loc[ix, "Qtde"] = max(0.0, q)
+    aplicar_totais_pedido(df_new)
+    return df_new

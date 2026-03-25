@@ -76,18 +76,30 @@ def _extrair_codigo(produto: str) -> tuple[str, str]:
     return "", produto
 
 
+def _linhas_dados(ws, padding: int = 600, cap: int = 12000) -> range:
+    """
+    Intervalo de linhas a percorrer em cada aba.
+    O max_row do openpyxl costuma subestimar folhas grandes; amplia com margem.
+    """
+    mr = max(ws.max_row or 0, 3)
+    end = min(mr + padding, cap)
+    return range(3, end + 1)
+
+
 # --- ABA 1: Personalizados ---
 # L1: título | L2: PRODUTO, VALOR, QTIDE, TOTAL | L3+: dados
 # Col A=produto (pode ter código), Col B=valor (UN)
 def extrair_personalizados(ws) -> list[dict]:
     itens = []
-    for r in range(3, ws.max_row + 1):
+    for r in _linhas_dados(ws):
         prod = ws.cell(r, 1).value
         val = ws.cell(r, 2).value
         if not prod or str(prod).strip() in ("PRODUTO", "TOTAL", ""):
             continue
         preco = _parse_valor(val)
-        if preco is None or preco <= 0:
+        if preco is None:
+            preco = 0.0
+        if preco < 0:
             continue
         cod, nome = _extrair_codigo(prod)
         itens.append({
@@ -104,12 +116,14 @@ def extrair_personalizados(ws) -> list[dict]:
 # L2: Bloco1 A=sabor B=valor | Bloco2 F=sabor G=valor | Un=KG
 def extrair_barras(ws) -> list[dict]:
     itens = []
-    for r in range(3, ws.max_row + 1):
+    for r in _linhas_dados(ws):
         sabor = ws.cell(r, 1).value
         val = ws.cell(r, 2).value
         if sabor and str(sabor).strip() and str(sabor).strip().upper() != "TOTAL":
             preco = _parse_valor(val)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Barras ao Leite",
                     "codigo": "",
@@ -117,12 +131,14 @@ def extrair_barras(ws) -> list[dict]:
                     "un": "KG",
                     "preco": round(preco, 2),
                 })
-    for r in range(3, ws.max_row + 1):
+    for r in _linhas_dados(ws):
         sabor = ws.cell(r, 6).value
         val = ws.cell(r, 7).value
         if sabor and str(sabor).strip() and str(sabor).strip().upper() != "TOTAL":
             preco = _parse_valor(val)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Barras Branco",
                     "codigo": "",
@@ -137,12 +153,14 @@ def extrair_barras(ws) -> list[dict]:
 # Bloco1: A=tipo B=valor/kg | Bloco2: F=tipo G=valor/und
 def extrair_bombons_liquidos(ws) -> list[dict]:
     itens = []
-    for r in range(3, ws.max_row + 1):
+    for r in _linhas_dados(ws):
         tipo = ws.cell(r, 1).value
         val_kg = ws.cell(r, 2).value
         if tipo and str(tipo).strip():
             preco = _parse_valor(val_kg)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Bombons Líquidos",
                     "codigo": "",
@@ -154,7 +172,9 @@ def extrair_bombons_liquidos(ws) -> list[dict]:
         val_un = ws.cell(r, 7).value
         if tipo2 and str(tipo2).strip():
             preco = _parse_valor(val_un)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Bombons Líquidos",
                     "codigo": "",
@@ -169,12 +189,14 @@ def extrair_bombons_liquidos(ws) -> list[dict]:
 # Bloco1: A=tipo B=valor/kg | Bloco2: G=tipo H=valor/und
 def extrair_bombons_12gr(ws) -> list[dict]:
     itens = []
-    for r in range(3, ws.max_row + 1):
+    for r in _linhas_dados(ws):
         tipo = ws.cell(r, 1).value
         val_kg = ws.cell(r, 2).value
         if tipo and str(tipo).strip() and "TOTAL" not in str(tipo).upper():
             preco = _parse_valor(val_kg)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Bombons 12gr",
                     "codigo": "",
@@ -186,7 +208,9 @@ def extrair_bombons_12gr(ws) -> list[dict]:
         val_un = ws.cell(r, 8).value
         if tipo2 and str(tipo2).strip() and "TOTAL" not in str(tipo2).upper():
             preco = _parse_valor(val_un)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Bombons 12gr",
                     "codigo": "",
@@ -201,12 +225,14 @@ def extrair_bombons_12gr(ws) -> list[dict]:
 # Bloco1: A=sabor B=valor (saco 25) | Bloco2: F=sabor G=valor (und)
 def extrair_trufas(ws) -> list[dict]:
     itens = []
-    for r in range(3, ws.max_row + 1):
+    for r in _linhas_dados(ws):
         sabor = ws.cell(r, 1).value
         val = ws.cell(r, 2).value
         if sabor and str(sabor).strip():
             preco = _parse_valor(val)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Trufas",
                     "codigo": "",
@@ -218,7 +244,9 @@ def extrair_trufas(ws) -> list[dict]:
         val2 = ws.cell(r, 7).value
         if sabor2 and str(sabor2).strip():
             preco = _parse_valor(val2)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Trufas",
                     "codigo": "",
@@ -233,12 +261,14 @@ def extrair_trufas(ws) -> list[dict]:
 # A=tipo B=valor (ex: "R$ 99,00 Kg")
 def extrair_degustacao(ws) -> list[dict]:
     itens = []
-    for r in range(3, ws.max_row + 1):
+    for r in _linhas_dados(ws):
         tipo = ws.cell(r, 1).value
         val = ws.cell(r, 2).value
         if tipo and str(tipo).strip():
             preco = _parse_valor(val)
-            if preco and preco > 0:
+            if preco is None:
+                preco = 0.0
+            if preco >= 0:
                 itens.append({
                     "categoria": "Degustação",
                     "codigo": "",
@@ -256,51 +286,54 @@ def extrair_degustacao(ws) -> list[dict]:
 def extrair_planilha9(ws) -> list[dict]:
     itens = []
     skip = {"", "50% CACAU", "70% CACAU", "BOMBOM ESPECIAIS"}
-    for r in range(3, ws.max_row + 1):
-        nome = ws.cell(r, 1).value
-        if nome and str(nome).strip() and str(nome).strip() not in skip:
-            val_kg = ws.cell(r, 2).value
-            val_un = ws.cell(r, 3).value
-            preco_kg = _parse_valor(val_kg)
-            preco_un = _parse_valor(val_un)
-            if preco_kg and preco_kg > 0:
-                itens.append({
-                    "categoria": "50% Cacau",
-                    "codigo": "",
-                    "produto": f"{str(nome).strip()} (kg)",
-                    "un": "KG",
-                    "preco": round(preco_kg, 2),
-                })
-            if preco_un and preco_un > 0 and preco_un != preco_kg:
-                itens.append({
-                    "categoria": "50% Cacau",
-                    "codigo": "",
-                    "produto": f"{str(nome).strip()} (un)",
-                    "un": "UN",
-                    "preco": round(preco_un, 2),
-                })
-        nome2 = ws.cell(r, 6).value
-        if nome2 and str(nome2).strip() and str(nome2).strip() not in skip:
-            val_kg2 = ws.cell(r, 7).value
-            val_un2 = ws.cell(r, 8).value
-            preco_kg2 = _parse_valor(val_kg2)
-            preco_un2 = _parse_valor(val_un2)
-            if preco_kg2 and preco_kg2 > 0:
-                itens.append({
-                    "categoria": "Bombons Especiais",
-                    "codigo": "",
-                    "produto": f"{str(nome2).strip()} (kg)",
-                    "un": "KG",
-                    "preco": round(preco_kg2, 2),
-                })
-            if preco_un2 and preco_un2 > 0 and preco_un2 != preco_kg2:
-                itens.append({
-                    "categoria": "Bombons Especiais",
-                    "codigo": "",
-                    "produto": f"{str(nome2).strip()} (un)",
-                    "un": "UN",
-                    "preco": round(preco_un2, 2),
-                })
+
+    def _bloco_planilha9(nome, val_kg, val_un, categoria: str):
+        if not nome or str(nome).strip() in skip:
+            return
+        pk = _parse_valor(val_kg)
+        pu = _parse_valor(val_un)
+        if pk is None:
+            pk = 0.0
+        if pu is None:
+            pu = 0.0
+        nm = str(nome).strip()
+        # Inclui linhas com preço só em kg, só em un, ou ambos; evita duplicar (un) quando igual a (kg)
+        if pk > 0:
+            itens.append({
+                "categoria": categoria,
+                "codigo": "",
+                "produto": f"{nm} (kg)",
+                "un": "KG",
+                "preco": round(pk, 2),
+            })
+        if pu > 0 and abs(pu - pk) > 1e-9:
+            itens.append({
+                "categoria": categoria,
+                "codigo": "",
+                "produto": f"{nm} (un)",
+                "un": "UN",
+                "preco": round(pu, 2),
+            })
+        elif pu > 0 and pk == 0:
+            itens.append({
+                "categoria": categoria,
+                "codigo": "",
+                "produto": f"{nm} (un)",
+                "un": "UN",
+                "preco": round(pu, 2),
+            })
+        elif pk == 0 and pu == 0:
+            itens.append({
+                "categoria": categoria,
+                "codigo": "",
+                "produto": f"{nm} (kg)",
+                "un": "KG",
+                "preco": 0.0,
+            })
+
+    for r in _linhas_dados(ws):
+        _bloco_planilha9(ws.cell(r, 1).value, ws.cell(r, 2).value, ws.cell(r, 3).value, "50% Cacau")
+        _bloco_planilha9(ws.cell(r, 6).value, ws.cell(r, 7).value, ws.cell(r, 8).value, "Bombons Especiais")
     return itens
 
 
@@ -313,15 +346,53 @@ EXTRATORES = {
     "Degustação": extrair_degustacao,
     "Planilha9": extrair_planilha9,
 }
+# Nomes alternativos comuns no Excel (acentos / maiúsculas)
+for _alias, _fn in (
+    ("Bombons líquidos", extrair_bombons_liquidos),
+    ("Bombons Líquidos", extrair_bombons_liquidos),
+    ("BOMBONS LIQUIDOS", extrair_bombons_liquidos),
+    ("Trufas", extrair_trufas),
+    ("TRUFAS", extrair_trufas),
+    ("Degustacao", extrair_degustacao),
+    ("DEGUSTAÇÃO", extrair_degustacao),
+    ("BARRAS", extrair_barras),
+    ("PERSONALIZADOS", extrair_personalizados),
+):
+    EXTRATORES.setdefault(_alias, _fn)
+
+
+def _extrator_por_nome_aba(sheet_name: str):
+    """
+    Resolve extrator mesmo com nome de aba ligeiramente diferente (encoding, maiúsculas, sufixos).
+    """
+    sn = (sheet_name or "").strip()
+    if sn in EXTRATORES:
+        return EXTRATORES[sn]
+    low = sn.lower()
+    low = low.replace("í", "i").replace("ã", "a").replace("ç", "c").replace("õ", "o")
+    if "degust" in low:
+        return extrair_degustacao
+    if "personaliz" in low:
+        return extrair_personalizados
+    if "planilha" in low and "9" in sn:
+        return extrair_planilha9
+    if "trufa" in low:
+        return extrair_trufas
+    if "bombom" in low or "bombons" in low:
+        if re.search(r"12\s*gr|12gr", low):
+            return extrair_bombons_12gr
+        if "liqu" in low or "liqui" in low:
+            return extrair_bombons_liquidos
+    if "barra" in low:
+        return extrair_barras
+    return None
 
 
 def extrair_todos_workbook(wb) -> list[dict]:
     """Extrai produtos a partir de um workbook já aberto (openpyxl)."""
     todos = []
     for sn in wb.sheetnames:
-        ext = EXTRATORES.get(sn)
-        if not ext and "Degust" in sn:
-            ext = extrair_degustacao
+        ext = EXTRATORES.get(sn) or _extrator_por_nome_aba(sn)
         if ext:
             try:
                 itens = ext(wb[sn])
