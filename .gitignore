@@ -1,7 +1,8 @@
-# Dados sensíveis — não enviar ao Git (exceto planilha padrão para deploy na nuvem)
-data/*.xlsx
+# Dados sensíveis — não enviar ao Git (exceto README + planilha oficial para a Streamlit Cloud)
+# Nota: "data/*.xlsx" + negação falha por vezes no Git; usar data/* + !ficheiro é mais fiável.
+data/*
+!data/README.txt
 !data/planilha.xlsx
-data/*.XLSX
 data/usuarios/
 data/users/
 data/.migrated_from_pedidos
