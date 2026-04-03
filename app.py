@@ -47,6 +47,7 @@ from utils import (
 )
 from busca_inteligente import buscar_produtos
 import auth
+from db_store import db_enabled
 
 # Som suave (Web Audio) — iframe 0px após clicar "Entrar no sistema"
 GW_CHIME_HTML = """
@@ -868,6 +869,11 @@ def _render_launch_splash() -> None:
 def _render_login():
     """Link público: cada pessoa cria o próprio usuário ou entra se já tiver cadastro."""
     st.markdown('<div id="gw-login-anchor" aria-hidden="true"></div>', unsafe_allow_html=True)
+    if st.session_state.pop("gw_duplicate_login_hint", None):
+        st.success(
+            "Esse login já está registado. Use **Entrar** com a sua senha — "
+            "o histórico de pedidos fica sempre ligado ao **mesmo** utilizador."
+        )
     if "gw_auth_choice" not in st.session_state:
         st.session_state["gw_auth_choice"] = "Entrar"
 
@@ -883,9 +889,9 @@ def _render_login():
     )
     st.markdown("### Acesso ao sistema")
     st.info(
-        "Quem recebe o **link** pode usar o sistema por aqui. "
-        "Em **Criar minha conta** você escolhe login e senha **só seus**. "
-        "Se já se cadastrou antes, use **Entrar**."
+        "Quem recebe o **link** usa o sistema por aqui. **Cada conta** guarda o seu próprio "
+        "histórico de pedidos e rascunhos — use **sempre o mesmo login** para ver tudo de novo; "
+        "não precisa criar outra conta. Já se cadastrou? Escolha **Entrar**."
     )
     st.radio(
         "Como deseja continuar?",
@@ -904,7 +910,10 @@ def _render_login():
                     st.session_state.pop("df_pedido", None)
                     st.rerun()
                 else:
-                    st.error("Usuário ou senha incorretos.")
+                    st.error(
+                        "Usuário ou senha incorretos. Se já criou conta, use o **mesmo** login em "
+                        "**Entrar** — não é preciso registar de novo."
+                    )
     else:
         with st.form("form_cadastro_publico"):
             nu = st.text_input(
@@ -926,6 +935,18 @@ def _render_login():
                             st.session_state[auth.SESSION_KEY] = u
                             st.session_state.pop("df_pedido", None)
                             st.rerun()
+                    except ValueError as e:
+                        msg = str(e)
+                        if "já está em uso" in msg:
+                            st.session_state["gw_auth_choice"] = "Entrar"
+                            try:
+                                st.session_state["pub_login_user"] = auth.sanitize_login(nu)
+                            except ValueError:
+                                st.session_state["pub_login_user"] = (nu or "").strip().lower()
+                            st.session_state["gw_duplicate_login_hint"] = True
+                            st.rerun()
+                        else:
+                            st.error(msg)
                     except Exception as e:
                         st.error(str(e))
 
@@ -950,6 +971,12 @@ def main():
             st.session_state.pop("df_pedido", None)
             st.rerun()
         st.caption("Novos colegas: envie o **mesmo link** do sistema — cada um cria a conta em *Criar minha conta*.")
+        if not db_enabled():
+            st.caption(
+                "Sem base de dados PostgreSQL, os ficheiros em `data/` podem **não persistir** "
+                "na Streamlit Cloud após reinícios. Configure **GRAMADOWAY_DATABASE_URL** nos "
+                "**Secrets** para manter contas e histórico de pedidos."
+            )
         st.markdown("---")
         if "df_pedido" in st.session_state:
             n_itens = int((st.session_state.df_pedido["Qtde"] > 0).sum())
