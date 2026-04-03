@@ -1,6 +1,7 @@
 [server]
 headless = true
-enableCORS = false
+# true evita bloqueios estranhos em alguns browsers / redes ao abrir o link público
+enableCORS = true
 enableXsrfProtection = true
 
 [browser]

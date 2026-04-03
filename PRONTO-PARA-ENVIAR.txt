@@ -1,19 +1,41 @@
-GRAMADOWAY — pasta sincronizada com o projeto completo (Cursor)
-================================================================
+GRAMADOWAY — GitHub + Streamlit Cloud
+======================================
 
-O que esta pasta TEM agora (para o Streamlit / GitHub):
-- app.py + produtos_catalogo.py (catálogo embutido + UI nova)
-- db_store.py + auth/historico/config_paths (base de dados opcional)
-- pages/1_Dashboard.py
-- data/planilha.xlsx + data/README.txt
-- scripts/ e supabase/
-- requirements.txt (streamlit, psycopg2-binary, etc.)
-- .gitignore (permite commit de data/planilha.xlsx)
+ERRO "nao tem acesso / app nao existe" (share.streamlit.io/errors/not_found)
+----------------------------------------------------------------------------
+Isto NAO e bug do codigo. Significa:
+- a app foi apagada na Cloud, OU
+- o link que abres esta errado (nao uses localhost), OU
+- a conta GitHub ligada ao deploy nao e a do repositorio.
 
-O que TU fazes em 2 passos:
-1) GitHub Desktop → Commit ALL → Push (main)
-2) Streamlit Cloud → Redeploy / Reboot da app
+Conta na imagem: padilhagustavo053@gmail.com + GitHub padilhagustavo053-ui
+O repositorio no GitHub TEM de ser o MESMO onde fizeste push do Gramadoway
+(e a Streamlit tem de ter permissao de leitura nesse repo).
 
-Link para partilhar: o .streamlit.app do painel Streamlit
+O que fazer (ordem):
+1) GitHub Desktop → garante Push para: github.com/padilhagustavo053-ui/SEU-REPO
+   (branch main, com app.py na raiz)
 
-Secrets opcional: GRAMADOWAY_DATABASE_URL (Supabase) para não perder logins/pedidos.
+2) Abre https://share.streamlit.io com a MESMA conta Google/GitHub
+
+3) Se a app sumiu: Deploy an app → From GitHub → escolhe o repo → branch main
+   Main file path: app.py
+   (nao uses localhost)
+
+4) Depois do deploy, o link CORRETO fica assim:
+   https://NOME-QUE-A-CLOUD-DAR.streamlit.app
+   Copia da barra de endereco — e ESSE que mandas aos outros.
+   NAO mandes: http://localhost:8501/ (so funciona no teu PC)
+
+5) Repo privado: em GitHub → Settings do repo → Collaborators / ou liga a Streamlit
+   com conta que tenha acesso ao repo.
+
+Ficheiros importantes no Git:
+- app.py (entrada)
+- requirements.txt
+- .streamlit/config.toml
+- pages/ (opcional)
+- data/planilha.xlsx (opcional, lista completa na nuvem)
+
+Secrets (Streamlit → app → Settings → Secrets): so se usas PostgreSQL ou API.
+Exemplo em .streamlit/secrets.toml.example

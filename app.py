@@ -12,6 +12,14 @@ from datetime import datetime
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
+
+# Obrigatório: primeira chamada Streamlit no script (senão a Cloud pode falhar / página em branco).
+st.set_page_config(
+    page_title="Gramadoway — Formulário de Pedido",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 from config_paths import (
     data_root,
     inject_streamlit_secrets_into_environ,
@@ -66,13 +74,6 @@ GW_CHIME_HTML = """
 </script>
 </body></html>
 """
-
-
-st.set_page_config(
-    page_title="Gramadoway — Formulário de Pedido",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 # CSS — Letras fortes, grossas, bem visíveis (font-weight 600–700)
 st.markdown("""

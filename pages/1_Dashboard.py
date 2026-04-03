@@ -10,6 +10,13 @@ from collections import defaultdict
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+st.set_page_config(
+    page_title="Painel de Controle BI — Gramadoway",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
 from config_paths import inject_streamlit_secrets_into_environ, migrate_legacy_pedidos_folder
 
 inject_streamlit_secrets_into_environ()
@@ -17,12 +24,6 @@ migrate_legacy_pedidos_folder()
 
 from historico import stats_dashboard
 import auth
-
-st.set_page_config(
-    page_title="Painel de Controle BI — Gramadoway",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
 
 # CSS — BI profissional, tema escuro, precisão visual
 st.markdown("""
@@ -215,11 +216,17 @@ def main():
     if not usuario:
         st.warning("Abra a página principal (Formulário), use **Entrar** ou **Criar minha conta**.")
         if st.button("Ir ao acesso / login", type="primary", use_container_width=True):
-            st.switch_page("app.py")
+            try:
+                st.switch_page("app.py")
+            except Exception:
+                st.info("Use o menu da esquerda (**app** ou **Formulário**) para voltar à página inicial.")
         st.stop()
 
     if st.button("← Voltar ao Formulário", key="dash_voltar_form"):
-        st.switch_page("app.py")
+        try:
+            st.switch_page("app.py")
+        except Exception:
+            st.info("Abra a página inicial pelo menu lateral (ícone **⋮** ou nome **app**).")
 
     st.markdown(f"""
     <div class="dash-header">
