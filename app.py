@@ -40,7 +40,6 @@ from utils import (
     mascara_cnpj,
     mascara_telefone,
     mascara_cep,
-    buscar_cep,
     formatar_moeda,
     aplicar_totais_pedido,
     chaves_produtos_df,
@@ -1106,30 +1105,7 @@ def main():
         fantasia = st.text_input("Fantasia", placeholder="Nome fantasia", key="fantasia")
         fone = st.text_input("Fone", placeholder="(00) 00000-0000", key="fone")
         bairro = st.text_input("Bairro", placeholder="Bairro", key="bairro")
-        c_cep, c_btn = st.columns([1, 1])
-        with c_cep:
-            cep = st.text_input(
-                "CEP",
-                placeholder="00000-000",
-                key="cep",
-                help="Informe 8 dígitos e clique em Preencher — busca automática (ViaCEP).",
-            )
-        with c_btn:
-            st.markdown('<div style="height:1.72rem"></div>', unsafe_allow_html=True)
-            if st.button("Preencher pelo CEP", use_container_width=True, key="gw_buscar_cep"):
-                raw = str(st.session_state.get("cep") or "")
-                dados = buscar_cep(raw)
-                st.session_state.pop("_gw_cep_msg", None)
-                if dados:
-                    st.session_state["endereco"] = dados.get("Endereço") or st.session_state.get("endereco", "")
-                    st.session_state["bairro"] = dados.get("Bairro") or st.session_state.get("bairro", "")
-                    st.session_state["cidade"] = dados.get("Cidade") or st.session_state.get("cidade", "")
-                    st.session_state["cep"] = mascara_cep(raw)
-                else:
-                    st.session_state["_gw_cep_msg"] = "CEP não encontrado ou incompleto. Use 8 dígitos."
-                st.rerun()
-    if st.session_state.get("_gw_cep_msg"):
-        st.warning(st.session_state["_gw_cep_msg"])
+        cep = st.text_input("CEP", placeholder="00000-000", key="cep")
     st.markdown("**Contato e condições**")
     col_c1, col_c2 = st.columns(2)
     with col_c1:
